@@ -188,6 +188,40 @@ export function UserDropdown({ onAddStationClick }: UserDropdownProps) {
                 <span>Add New Charging Station</span>
               </Link>
             )}
+
+            <div className="border-t border-slate-100 my-1"></div>
+
+            <Link
+              href="/about"
+              onClick={() => setIsOpen(false)}
+              className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors font-medium"
+            >
+              <span>About Kigali EV Network</span>
+            </Link>
+
+            <Link
+              href="/contact"
+              onClick={() => setIsOpen(false)}
+              className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors font-medium"
+            >
+              <span>Contact &amp; Support</span>
+            </Link>
+
+            <Link
+              href="/privacy"
+              onClick={() => setIsOpen(false)}
+              className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors font-medium"
+            >
+              <span>Privacy Policy</span>
+            </Link>
+
+            <Link
+              href="/usage-policy"
+              onClick={() => setIsOpen(false)}
+              className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors font-medium"
+            >
+              <span>Usage Policy &amp; Terms</span>
+            </Link>
           </div>
 
           {/* 3. Account ID & Meta Info */}
