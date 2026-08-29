@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { NavigationHeader } from '@/components/NavigationHeader';
 import { AuthProvider } from '@/lib/authContext';
+import { AIChatbot } from '@/components/chatbot/AIChatbot';
 
 export const metadata: Metadata = {
   title: 'EVchargers | Interactive EV Charging Map & Network (Kigali)',
@@ -20,8 +21,10 @@ export default function RootLayout({
         <AuthProvider>
           <NavigationHeader />
           <main className="relative flex-1 overflow-hidden">{children}</main>
+          <AIChatbot />
         </AuthProvider>
       </body>
     </html>
   );
 }
+

@@ -83,6 +83,63 @@ export default function DriverMapPage() {
     fetchStations(currentBounds, filters);
   }, [filters]);
 
+  // Handle URL query parameters (e.g. ?stationId=st-kigali-01&lat=-1.95&lng=30.09)
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const urlParams = new URLSearchParams(window.location.search);
+    const stationId = urlParams.get('stationId');
+    const lat = urlParams.get('lat');
+    const lng = urlParams.get('lng');
+
+    if (lat && lng) {
+      const latNum = parseFloat(lat);
+      const lngNum = parseFloat(lng);
+      if (!isNaN(latNum) && !isNaN(lngNum)) {
+        setFlyToLocation({ lat: latNum, lng: lngNum });
+      }
+    }
+
+    if (stationId) {
+      // Find station by ID from API or current list
+      fetch(`/api/stations/${stationId}`)
+        .then((res) => res.json())
+        .then((json) => {
+          if (json.success && json.data) {
+            setSelectedStation(json.data);
+            setFlyToLocation({ lat: json.data.latitude, lng: json.data.longitude });
+          }
+        })
+        .catch((err) => console.warn('Could not auto-select station from URL:', err));
+    }
+  }, []);
+
+  // Listen for global custom events from AI Chatbot or navigation
+  useEffect(() => {
+    const handleSelectStationEvent = (e: Event) => {
+      const customEvent = e as CustomEvent<{ station: Station }>;
+      if (customEvent.detail?.station) {
+        const s = customEvent.detail.station;
+        setSelectedStation(s);
+        setFlyToLocation({ lat: s.latitude, lng: s.longitude });
+      }
+    };
+
+    const handleApplyFiltersEvent = (e: Event) => {
+      const customEvent = e as CustomEvent<{ filters: StationFilter }>;
+      if (customEvent.detail?.filters) {
+        setFilters((prev) => ({ ...prev, ...customEvent.detail.filters }));
+      }
+    };
+
+    window.addEventListener('ev:select-station', handleSelectStationEvent);
+    window.addEventListener('ev:apply-filters', handleApplyFiltersEvent);
+
+    return () => {
+      window.removeEventListener('ev:select-station', handleSelectStationEvent);
+      window.removeEventListener('ev:apply-filters', handleApplyFiltersEvent);
+    };
+  }, []);
+
   const handleBoundsChange = (bounds: BoundingBox) => {
     setCurrentBounds(bounds);
     fetchStations(bounds, filters);

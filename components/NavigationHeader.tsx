@@ -13,6 +13,8 @@ import {
   X,
   Shield,
   FileText,
+  Bot,
+  Sparkles,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -27,6 +29,13 @@ export function NavigationHeader() {
   const isMapPath = pathname === '/';
   const { user, isSiteAdmin } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const handleOpenAIChat = () => {
+    setMobileMenuOpen(false);
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('ev:open-chat'));
+    }
+  };
 
   return (
     <header className="sticky top-0 z-30 flex flex-col border-b border-slate-200 bg-white/95 backdrop-blur-md shadow-sm">
@@ -62,6 +71,19 @@ export function NavigationHeader() {
             <MapPin className="h-4 w-4 text-brand-600" />
             <span>Driver Map</span>
           </Link>
+
+          {/* AI Guide Trigger Link */}
+          <button
+            type="button"
+            onClick={handleOpenAIChat}
+            className="flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-semibold sm:text-sm text-brand-700 bg-emerald-50 hover:bg-emerald-100/80 border border-emerald-200/70 shadow-sm transition-colors"
+          >
+            <Bot className="h-4 w-4 text-brand-600" />
+            <span>AI Assistant</span>
+            <span className="rounded-full bg-brand-200/70 px-1.5 py-0.2 text-[9px] font-bold text-brand-800 uppercase">
+              NEW
+            </span>
+          </button>
 
           {/* About Link */}
           <Link
@@ -125,6 +147,16 @@ export function NavigationHeader() {
 
         {/* Mobile Action Controls */}
         <div className="flex items-center gap-2 md:hidden">
+          <button
+            type="button"
+            onClick={handleOpenAIChat}
+            className="flex items-center gap-1 rounded-xl bg-brand-50 border border-brand-200 px-2.5 py-1.5 text-xs font-bold text-brand-700"
+            aria-label="Open AI Assistant"
+          >
+            <Bot className="h-4 w-4 text-brand-600" />
+            <span>AI</span>
+          </button>
+
           {user && <UserDropdown />}
 
           <button
@@ -151,6 +183,20 @@ export function NavigationHeader() {
             <MapPin className="h-4 w-4 text-brand-600" />
             <span>Driver Map</span>
           </Link>
+
+          <button
+            type="button"
+            onClick={handleOpenAIChat}
+            className="flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200/80 transition-colors text-left"
+          >
+            <div className="flex items-center gap-2.5">
+              <Bot className="h-4 w-4 text-emerald-600" />
+              <span>ChargeBot AI Assistant</span>
+            </div>
+            <span className="rounded-full bg-emerald-200 px-1.5 py-0.2 text-[9px] font-bold text-emerald-900">
+              NEW
+            </span>
+          </button>
 
           <Link
             href="/about"
@@ -213,3 +259,4 @@ export function NavigationHeader() {
     </header>
   );
 }
+

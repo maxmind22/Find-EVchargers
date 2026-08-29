@@ -190,8 +190,8 @@ export function EVMap({
       {/* Map Container */}
       <div ref={mapContainerRef} className="h-full w-full" />
 
-      {/* Floating Map Controls */}
-      <div className="absolute right-4 bottom-24 sm:bottom-6 z-20 flex flex-col gap-2">
+      {/* Floating Map Controls (Stacked cleanly above the bottom-right AI Chatbot) */}
+      <div className="absolute right-4 sm:right-6 bottom-24 sm:bottom-24 z-20 flex flex-col gap-2">
         <button
           onClick={handleLocateMe}
           disabled={isLocating}
