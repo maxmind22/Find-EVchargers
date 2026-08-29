@@ -45,9 +45,22 @@ Notes: ${s.notes || 'None'}`;
   return `You are "ChargeBot", the official AI Assistant for "EVchargers Kigali" (https://evchargers.rw) - Rwanda's premier electric vehicle charging map and infrastructure platform.
 
 YOUR IDENTITY & TONE:
-- You are friendly, expert, helpful, fast, and knowledgeable about EV technology and the Kigali/Rwanda EV ecosystem.
-- You provide clear, concise, and beautifully formatted answers with markdown (bold, bullet points, headers).
+- You are friendly, expert, helpful, fast, concise, and focused on EV technology and the Kigali/Rwanda EV ecosystem.
+- You provide clear, concise, and beautifully formatted answers with markdown (bold, bullet points, headers). Keep responses under 150-200 words.
 - When mentioning stations, ALWAYS mention their exact names, locations, and connector specs.
+
+STRICT DOMAIN SCOPE & GUARDRAILS:
+- You are strictly an Electric Vehicle & Charging Infrastructure Assistant.
+- ONLY answer topics related to:
+  * EV charging stations, hubs, locations, navigation, and finding chargers in Kigali/Rwanda
+  * EV connector standards (GB/T for BYD & Chinese EVs, CCS2, Type 2, CHAdeMO, NACS) and vehicle compatibility
+  * Charging power (kW), battery charging times, and kilowatt calculations
+  * Electricity rates (REG tariffs), costs, and free charging spots in Kigali
+  * Using this platform (Driver Map, filters, reporting broken plugs, and host registration at /admin)
+- IF A USER ASKS ANYTHING OUTSIDE THIS SCOPE (e.g. general coding/programming, academic homework, recipes, poetry, creative fiction, general trivia, politics, crypto, or non-EV questions):
+  * DO NOT fulfill the off-topic request.
+  * Politely and concisely decline in 1-2 friendly sentences: "I am specialized exclusively in electric vehicles and charging in Kigali! Feel free to ask me about finding charging stations, BYD (GB/T) plugs, ultra-fast DC chargers, or electricity tariffs."
+  * Provide standard EV suggested actions in the JSON footer.
 
 ABOUT THIS WEBSITE & PLATFORM:
 - Driver Map (Home Page): An interactive Leaflet map of all charging stations in Kigali. Drivers can search locations, filter by plug type (CCS_2, GB_T, TYPE_2, CHAdeMO, NACS, TYPE_1), set minimum power (kW), filter free chargers, and click any marker to view real-time speeds and get GPS directions (Google Maps, Apple Maps, Waze).
@@ -132,7 +145,7 @@ async function callGemini(
         body: JSON.stringify({
           systemInstruction: { parts: [{ text: systemPrompt }] },
           contents: formattedContents,
-          generationConfig: { temperature: 0.3, maxOutputTokens: 1024 },
+          generationConfig: { temperature: 0.2, maxOutputTokens: 550 },
         }),
       });
 
@@ -213,8 +226,8 @@ async function callOpenAICompatible(
         content: m.content,
       })),
     ],
-    temperature: 0.3,
-    max_tokens: 1024,
+    temperature: 0.2,
+    max_tokens: 550,
   };
 
   const response = await fetch(apiUrl, {
@@ -433,6 +446,12 @@ export async function processChatQuery(params: {
   const lastUserMessage =
     [...messages].reverse().find((m) => m.role === 'user')?.content || '';
 
+  // Enforce sliding window history (last 6 messages) & 500 character limit to conserve tokens
+  const boundedMessages: ChatMessage[] = messages.slice(-6).map((m) => ({
+    role: m.role,
+    content: (m.content || '').slice(0, 500),
+  }));
+
   // 1. Fetch live stations from database
   const allStations = await getStations();
 
@@ -446,7 +465,7 @@ export async function processChatQuery(params: {
   // If Gemini API key is present, invoke Google Gemini (100% Free via Google AI Studio)
   if (geminiApiKey && geminiApiKey.trim() !== '') {
     try {
-      const { text, model } = await callGemini(geminiApiKey, messages, systemPrompt);
+      const { text, model } = await callGemini(geminiApiKey, boundedMessages, systemPrompt);
       const parsed = extractStationIdsAndJson(text, allStations);
       return {
         reply: parsed.cleanText,
@@ -466,7 +485,7 @@ export async function processChatQuery(params: {
         groqApiKey,
         'https://api.groq.com/openai/v1/chat/completions',
         'llama-3.3-70b-versatile',
-        messages,
+        boundedMessages,
         systemPrompt,
         'Groq Cloud'
       );
@@ -489,7 +508,7 @@ export async function processChatQuery(params: {
         openaiApiKey,
         'https://api.openai.com/v1/chat/completions',
         'gpt-4o-mini',
-        messages,
+        boundedMessages,
         systemPrompt,
         'OpenAI'
       );

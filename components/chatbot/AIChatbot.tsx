@@ -508,10 +508,16 @@ export function AIChatbot() {
                       value={input}
                       onChange={(e) => setInput(e.target.value)}
                       onKeyDown={handleKeyDown}
+                      maxLength={500}
                       placeholder="Ask about BYD plugs, fast chargers, tariffs..."
                       rows={1}
                       className="w-full resize-none rounded-2xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 focus:border-brand-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 max-h-28"
                     />
+                    {input.length > 350 && (
+                      <span className="absolute bottom-1 right-2 text-[9px] font-medium text-slate-400">
+                        {input.length}/500
+                      </span>
+                    )}
                   </div>
 
                   <button
@@ -527,7 +533,7 @@ export function AIChatbot() {
                 <div className="mt-1.5 flex items-center justify-between text-[10px] text-slate-400 px-1">
                   <span>Press Enter to send</span>
                   <span className="flex items-center gap-1 text-brand-600 font-medium">
-                    <Zap className="h-3 w-3" /> Live Station RAG Enabled
+                    <Zap className="h-3 w-3" /> EV Guardrails Active
                   </span>
                 </div>
               </div>
