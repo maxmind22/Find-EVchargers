@@ -78,3 +78,10 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) for the Driver Map & AI Assistant, or [http://localhost:3000/admin](http://localhost:3000/admin) for the Host Portal.
 
+---
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
+
+
