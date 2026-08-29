@@ -50,23 +50,27 @@ YOUR IDENTITY & TONE:
 - When mentioning stations, ALWAYS mention their exact names, locations, and connector specs.
 
 STRICT DOMAIN SCOPE & GUARDRAILS:
-- You are strictly an Electric Vehicle & Charging Infrastructure Assistant.
-- ONLY answer topics related to:
+- You are strictly an Electric Vehicle & Platform Assistant for EVchargers Kigali (https://evchargers.rw).
+- YOU ENTHUSIASTICALLY ANSWER ALL QUESTIONS ABOUT:
+  * How to navigate and use this website (Driver Map, search bar, connector filters, station drawers)
+  * How to add, edit, or remove/delete charging stations as a host on the Host Hub (/admin)
+  * How to contact station owners, report broken connectors or ICE-blocked bays, or reach platform support (/contact)
   * EV charging stations, hubs, locations, navigation, and finding chargers in Kigali/Rwanda
   * EV connector standards (GB/T for BYD & Chinese EVs, CCS2, Type 2, CHAdeMO, NACS) and vehicle compatibility
   * Charging power (kW), battery charging times, and kilowatt calculations
   * Electricity rates (REG tariffs), costs, and free charging spots in Kigali
-  * Using this platform (Driver Map, filters, reporting broken plugs, and host registration at /admin)
-- IF A USER ASKS ANYTHING OUTSIDE THIS SCOPE (e.g. general coding/programming, academic homework, recipes, poetry, creative fiction, general trivia, politics, crypto, or non-EV questions):
+- IF A USER ASKS ANYTHING COMPLETELY UNRELATED (e.g. general coding/programming, academic homework, recipes, poetry, creative fiction, general trivia, politics, crypto):
   * DO NOT fulfill the off-topic request.
-  * Politely and concisely decline in 1-2 friendly sentences: "I am specialized exclusively in electric vehicles and charging in Kigali! Feel free to ask me about finding charging stations, BYD (GB/T) plugs, ultra-fast DC chargers, or electricity tariffs."
+  * Politely and concisely decline in 1-2 friendly sentences: "I am specialized exclusively in EV charging in Kigali and navigating this platform! Feel free to ask me about finding stations, adding/editing chargers, plug compatibility, or tariffs."
   * Provide standard EV suggested actions in the JSON footer.
 
-ABOUT THIS WEBSITE & PLATFORM:
-- Driver Map (Home Page): An interactive Leaflet map of all charging stations in Kigali. Drivers can search locations, filter by plug type (CCS_2, GB_T, TYPE_2, CHAdeMO, NACS, TYPE_1), set minimum power (kW), filter free chargers, and click any marker to view real-time speeds and get GPS directions (Google Maps, Apple Maps, Waze).
-- Station Host Hub (/admin): Where property owners, hotels, shopping malls, and charge point operators can register and manage their charging stations, configure connector power, adjust pricing, and monitor status.
-- Issue Reporting: Drivers can report broken plugs, offline stations, or ICE-ing (gasoline cars blocking EV bays) via the report button on each station drawer.
-- Navigation & Directions: Every station card provides 1-click GPS navigation links.
+ABOUT THIS WEBSITE & PLATFORM FEATURES (Answer questions using this guide):
+- Driver Map (Home Page - "/"): Interactive Leaflet map. Drivers can search locations, filter by plug type (CCS_2, GB_T, TYPE_2, CHAdeMO, NACS, TYPE_1), set minimum power (kW), filter free chargers, and click any marker to view real-time speeds, power ratings, and get GPS directions (Google Maps, Apple Maps, Waze).
+- How to Add a Station (/admin): Click "Host Sign In" in the top bar (or go to /admin), log in/sign up, click "Register New Station", enter address & GPS coordinates, add connectors (kW and plug types), set pricing, and save.
+- How to Edit or Remove a Station: Log into /admin, find your station in the list, click "Edit" to modify specs/pricing or click "Delete" to remove it from the live map.
+- How to Contact Owners & Report Issues: Click any station on the map to open the drawer, then click "Report broken plug or issue" at the bottom to submit broken socket or blocked parking reports.
+- Support & Inquiries (/contact): Users and hosts can submit inquiries or partnership requests through the Contact Us page.
+- About & Policies: Available at /about, /privacy, and /usage-policy.
 
 RWANDA EV & CHARGING KNOWLEDGE BASE:
 - Plugs / Connectors in Kigali:
@@ -92,7 +96,7 @@ When you recommend or reference specific stations in your answer, you MUST list 
 \`\`\`
 This allows our UI to render clickable interactive station cards that let the user fly directly to the station on the live map with 1 click!
 
-If the user is asking a general question (e.g. "How does AC vs DC charging work?" or "How do I list my hotel?"), answer helpfully and provide 2-3 relevant suggested action queries.`;
+If the user is asking a general question (e.g. "How do I navigate the site?", "How to delete a station?", "How do I contact support?"), answer helpfully with clear numbered steps and provide 2-3 relevant suggested action queries.`;
 }
 
 /**
@@ -183,7 +187,7 @@ async function callGemini(
             body: JSON.stringify({
               systemInstruction: { parts: [{ text: systemPrompt }] },
               contents: formattedContents,
-              generationConfig: { temperature: 0.3, maxOutputTokens: 1024 },
+              generationConfig: { temperature: 0.2, maxOutputTokens: 550 },
             }),
           });
 
@@ -261,7 +265,74 @@ function runLocalKnowledgeEngine(
 ): { text: string; stationIds: string[]; suggestedActions: string[] } {
   const q = query.toLowerCase();
 
-  // 1. BYD / GB/T Plug search
+  // 1. Site Navigation questions (How to use map, search, filter, navigate)
+  if (
+    q.includes('navigate') ||
+    q.includes('how to use') ||
+    q.includes('how do i use') ||
+    q.includes('search') ||
+    q.includes('find charger') ||
+    q.includes('how does the site work') ||
+    q.includes('filter')
+  ) {
+    return {
+      text: `### 🗺️ How to Navigate the Site:\n* **Find Chargers**: Explore the interactive **Driver Map** on the home page.\n* **Search Area**: Type any neighborhood in the top search bar (e.g. *Kimihurura, Airport*).\n* **Filter**: Use the top filter chips to select **GB/T (BYD)**, **CCS2**, or minimum kW speeds.\n* **Directions**: Click any station marker to open details and launch 1-click GPS navigation in Google Maps, Apple Maps, or Waze.`,
+      stationIds: allStations.slice(0, 3).map((s) => s.id),
+      suggestedActions: [
+        '⚡ Fast DC Chargers (>100kW)',
+        '🚗 Where to charge BYD (GB/T)?',
+        '🏢 How to add/remove a charger?',
+      ],
+    };
+  }
+
+  // 2. Add / Edit / Remove / Delete Station questions
+  if (
+    q.includes('add charger') ||
+    q.includes('remove charger') ||
+    q.includes('delete') ||
+    q.includes('edit station') ||
+    q.includes('host') ||
+    q.includes('register') ||
+    q.includes('list') ||
+    q.includes('my charger') ||
+    q.includes('install')
+  ) {
+    return {
+      text: `### ⚡ Managing Charging Stations (Host Portal):\n* **Add a Charger**: Go to **Host Sign In** (or visit \`/admin\`), click **"Register New Station"**, drop a map pin, configure plug types (GB/T, CCS2) and pricing, then save.\n* **Edit a Charger**: Log into \`/admin\`, find your station in the list, and click **"Edit"** to modify power (kW), pricing, or operational status.\n* **Remove / Delete**: On the \`/admin\` dashboard, click **"Delete"** next to your station to remove it from the live map.`,
+      stationIds: [],
+      suggestedActions: [
+        'How to contact support or owners?',
+        'What are the charging tariffs?',
+        '⚡ Fast DC Chargers (>100kW)',
+      ],
+    };
+  }
+
+  // 3. Contact owner / support / report broken plug questions
+  if (
+    q.includes('contact') ||
+    q.includes('owner') ||
+    q.includes('operator') ||
+    q.includes('support') ||
+    q.includes('broken') ||
+    q.includes('report') ||
+    q.includes('issue') ||
+    q.includes('blocked') ||
+    q.includes('help')
+  ) {
+    return {
+      text: `### 📞 Contacting Owners & Support:\n* **Report Station Issues**: Click any station marker on the map to open its drawer, then click **"Report broken plug or issue"** at the bottom to submit broken socket or ICE-blocked reports.\n* **Contact Platform Support**: Visit our **Contact Page** (\`/contact\`) to send messages, host inquiries, or partnership requests directly to our team.\n* **Operator Info**: Every station drawer displays the official operator name (e.g. REG, Ampersand, Spiro, BasiGo).`,
+      stationIds: allStations.slice(0, 2).map((s) => s.id),
+      suggestedActions: [
+        'How to navigate the site?',
+        '🏢 How to add/remove a charger?',
+        '⚡ Fast DC Chargers (>100kW)',
+      ],
+    };
+  }
+
+  // 4. BYD / GB/T Plug search
   if (
     q.includes('byd') ||
     q.includes('gbt') ||
@@ -284,7 +355,7 @@ function runLocalKnowledgeEngine(
     };
   }
 
-  // 2. Fast DC / Speed / kW search
+  // 5. Fast DC / Speed / kW search
   if (
     q.includes('fast') ||
     q.includes('speed') ||
@@ -311,7 +382,7 @@ function runLocalKnowledgeEngine(
     };
   }
 
-  // 3. Free Charging Search
+  // 6. Free Charging Search
   if (
     q.includes('free') ||
     q.includes('gratuit') ||
@@ -326,34 +397,12 @@ function runLocalKnowledgeEngine(
       suggestedActions: [
         'Fast DC Chargers (>100kW)',
         'Where to charge BYD (GB/T)?',
-        'How to list my station?',
+        '🏢 How to add/remove a charger?',
       ],
     };
   }
 
-  // 4. Host / Admin / List Station questions
-  if (
-    q.includes('host') ||
-    q.includes('add station') ||
-    q.includes('register') ||
-    q.includes('list') ||
-    q.includes('admin') ||
-    q.includes('my charger') ||
-    q.includes('business') ||
-    q.includes('install')
-  ) {
-    return {
-      text: `To list your charging station on EVchargers:\n\n1. Go to **Host Sign In** (or visit \`/admin\`).\n2. Click **"Register New Station"** and enter your location details.\n3. Add your connector types, power ratings (kW), and pricing.\n\nYour charger will immediately appear on the live Driver Map!`,
-      stationIds: [],
-      suggestedActions: [
-        'What are the charging tariffs?',
-        'Fast DC Chargers (>100kW)',
-        'Where to charge BYD (GB/T)?',
-      ],
-    };
-  }
-
-  // 5. Tariffs / Pricing / REG questions
+  // 7. Tariffs / Pricing / REG questions
   if (
     q.includes('price') ||
     q.includes('cost') ||
@@ -375,7 +424,7 @@ function runLocalKnowledgeEngine(
     };
   }
 
-  // 6. Connectors & Standards (CCS2, Type 2, GB/T, CHAdeMO)
+  // 8. Connectors & Standards (CCS2, Type 2, GB/T, CHAdeMO)
   if (
     q.includes('connector') ||
     q.includes('plug') ||
@@ -396,7 +445,7 @@ function runLocalKnowledgeEngine(
     };
   }
 
-  // 7. Area / Location search
+  // 9. Area / Location search
   const matchingByArea = allStations.filter((s) => {
     const text = `${s.name} ${s.address} ${s.city || ''}`.toLowerCase();
     return (
@@ -424,13 +473,13 @@ function runLocalKnowledgeEngine(
 
   // General default helpful overview
   return {
-    text: `I'm ChargeBot, your Kigali EV Assistant. I can help you find fast DC chargers, check BYD (GB/T) compatibility, explore tariffs, or list your station.`,
+    text: `I'm ChargeBot, your Kigali EV Guide. Ask me about:\n* Finding chargers & navigation on the Driver Map\n* Adding, editing, or deleting chargers on the Host Hub (/admin)\n* BYD (GB/T) & CCS2 plug compatibility\n* Charging rates & reporting broken plugs`,
     stationIds: allStations.slice(0, 3).map((s) => s.id),
     suggestedActions: [
+      '🗺️ How to navigate the site?',
+      '🏢 How to add/remove a charger?',
       '⚡ Fast DC Chargers (>100kW)',
       '🚗 Where to charge BYD (GB/T)?',
-      '🆓 Free charging in Kigali',
-      '💡 How do I list my station?',
     ],
   };
 }
