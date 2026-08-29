@@ -22,12 +22,47 @@ An interactive platform to discover, filter, and navigate to electric vehicle (E
   * **1-Click Turn-by-Turn Navigation**: Directly opens **Google Maps**, **Apple Maps**, or **Waze**.
   * **Community Feedback**: Drivers can report broken plugs or blocked stalls.
 
-### 2. Admin Management Portal (`/admin`)
+### 2. ChargeBot — AI EV Assistant & Platform Guide
+* **Live Station RAG**: Connects directly to the real-time database to recommend stations based on location, plug type, power output, or pricing.
+* **Plug & Vehicle Compatibility**: Specialized guidance for **GB/T (BYD & Chinese EV imports)**, **CCS 2**, **Type 2 Mennekes**, and **CHAdeMO**.
+* **Interactive Chat Station Cards**: Recommendations embed clickable cards with live status, connector specs, and a **"📍 Locate on Map"** button that flies the Leaflet map to the charger and opens its drawer.
+* **Platform Navigator**: Explains how to use the map, search areas, apply filters, contact operators, report broken plugs, or list stations as a host.
+* **Dual Hybrid Engine**:
+  * **Zero-Config Built-in Intelligence**: Works instantly out of the box with zero external API keys.
+  * **Generative LLM Integration**: Connects to **Google Gemini API** (`gemini-3.6-flash` / `gemini-2.5-flash`) or **Groq Cloud** with 1 environment variable.
+* **Domain Guardrails & Token Optimization**: Restricts responses strictly to EV charging and platform features, preserving token quotas.
+
+### 3. Admin & Host Management Portal (`/admin`)
 * **Click-to-Drop Map Pin**: Click anywhere on the map or drag the pin to capture precise latitude/longitude.
 * **Address Geocoding**: Type an address to auto-center the map and place the pin.
 * **Dynamic Multi-Plug Builder**: Add multiple connectors per station with GB/T, CCS 2, Type 2 presets.
 * **Station Directory & Quick Management**: Searchable data table with instant status toggles, inline editing, and deletion.
 * **One-Click Demo Seeder**: Instantly populate realistic sample charging stations across Kigali.
+
+---
+
+## Environment Configuration (`.env.local`)
+
+Create a `.env.local` file in the root directory to configure optional LLM or database providers:
+
+```env
+# ====================================================================
+# AI CHATBOT LLM CONFIGURATION (OPTIONAL)
+# Get a 100% free key (no credit card) at: https://aistudio.google.com/
+# ====================================================================
+GEMINI_API_KEY="your_gemini_api_key_here"
+
+# Optional: Groq Cloud (Free tier at https://console.groq.com/)
+GROQ_API_KEY=""
+
+# ====================================================================
+# SUPABASE DATABASE CONFIGURATION (OPTIONAL)
+# (If left blank, the app uses in-memory/local persistence)
+# ====================================================================
+NEXT_PUBLIC_SUPABASE_URL=""
+NEXT_PUBLIC_SUPABASE_ANON_KEY=""
+SUPABASE_SERVICE_ROLE_KEY=""
+```
 
 ---
 
@@ -41,4 +76,5 @@ npm install
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) for the Driver Map, or [http://localhost:3000/admin](http://localhost:3000/admin) for the Admin Portal.
+Open [http://localhost:3000](http://localhost:3000) for the Driver Map & AI Assistant, or [http://localhost:3000/admin](http://localhost:3000/admin) for the Host Portal.
+
