@@ -39,13 +39,15 @@ export function MapPinPicker({
       attributionControl: false,
     });
 
-    L.tileLayer(
-      'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
-      {
-        subdomains: 'abcd',
-        maxZoom: 19,
-      }
-    ).addTo(map);
+    const cartoKey = process.env.NEXT_PUBLIC_CARTO_API_KEY;
+    const tileUrl = cartoKey
+      ? `https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png?key=${cartoKey}`
+      : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
+
+    L.tileLayer(tileUrl, {
+      subdomains: 'abcd',
+      maxZoom: 19,
+    }).addTo(map);
 
     const pinIcon = L.divIcon({
       className: 'custom-leaflet-marker',

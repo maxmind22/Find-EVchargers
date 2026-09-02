@@ -62,6 +62,12 @@ GROQ_API_KEY=""
 NEXT_PUBLIC_SUPABASE_URL=""
 NEXT_PUBLIC_SUPABASE_ANON_KEY=""
 SUPABASE_SERVICE_ROLE_KEY=""
+
+# ====================================================================
+# CARTO MAPS CONFIGURATION (OPTIONAL - REMOVES MAP WATERMARKS)
+# Get a 100% free key (up to 5M loads/month) at https://carto.com/basemaps/apikey
+# ====================================================================
+NEXT_PUBLIC_CARTO_API_KEY=""
 ```
 
 ---
