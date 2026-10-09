@@ -177,7 +177,7 @@ export function ConnectorBuilder({ connectors, onChange }: ConnectorBuilderProps
                           current_type: preset?.defaultCurrent || 'DC',
                         });
                       }}
-                      className="w-full rounded-xl border border-slate-200 bg-white p-2.5 text-xs font-medium text-slate-900 focus:border-brand-500 focus:outline-none shadow-sm"
+                      className="w-full rounded-xl border border-slate-200 bg-white p-2.5 text-base sm:text-xs font-medium text-slate-900 focus:border-brand-500 focus:outline-none shadow-sm"
                     >
                       {CONNECTOR_TYPES.map((t) => (
                         <option key={t.type} value={t.type}>
@@ -204,7 +204,7 @@ export function ConnectorBuilder({ connectors, onChange }: ConnectorBuilderProps
                           current_type: kw > 22 ? 'DC' : 'AC',
                         });
                       }}
-                      className="w-full rounded-xl border border-slate-200 bg-white p-2.5 text-xs font-medium text-slate-900 focus:border-brand-500 focus:outline-none shadow-sm"
+                      className="w-full rounded-xl border border-slate-200 bg-white p-2.5 text-base sm:text-xs font-medium text-slate-900 focus:border-brand-500 focus:outline-none shadow-sm"
                     />
                     <span className="text-[10px] text-slate-400 mt-0.5 block">
                       Max speed to 1 vehicle (e.g. 120 kW)
@@ -224,7 +224,7 @@ export function ConnectorBuilder({ connectors, onChange }: ConnectorBuilderProps
                       onChange={(e) =>
                         handleUpdate(idx, { quantity: parseInt(e.target.value) || 1 })
                       }
-                      className="w-full rounded-xl border border-slate-200 bg-white p-2.5 text-xs font-medium text-slate-900 focus:border-brand-500 focus:outline-none shadow-sm"
+                      className="w-full rounded-xl border border-slate-200 bg-white p-2.5 text-base sm:text-xs font-medium text-slate-900 focus:border-brand-500 focus:outline-none shadow-sm"
                     />
                     <span className="text-[10px] text-slate-400 mt-0.5 block">
                       Simultaneous parking stalls
@@ -246,7 +246,7 @@ export function ConnectorBuilder({ connectors, onChange }: ConnectorBuilderProps
                             current_type: kw > 22 ? 'DC' : 'AC',
                           })
                         }
-                        className={`rounded-lg px-2 py-0.5 text-[10px] font-semibold transition-colors ${
+                        className={`min-h-[30px] rounded-lg px-2.5 py-1 text-[11px] font-semibold transition-colors active:scale-95 ${
                           c.power_kw === kw
                             ? 'bg-brand-600 text-white'
                             : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-100'

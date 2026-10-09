@@ -263,7 +263,7 @@ export function AIChatbot() {
     <>
       {/* Floating Action Button (Bottom Right) */}
       {!isOpen && (
-        <div className="fixed bottom-5 right-5 z-40 flex items-center gap-3">
+        <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-30 flex items-center gap-3">
           {/* Welcome Floating Bubble */}
           {hasUnreadNotification && (
             <div
@@ -295,7 +295,7 @@ export function AIChatbot() {
               setIsOpen(true);
               setIsMinimized(false);
             }}
-            className="group relative flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-tr from-brand-600 via-brand-500 to-emerald-400 p-3 text-white shadow-xl shadow-brand-600/30 hover:scale-105 hover:shadow-2xl transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-brand-500/30"
+            className="group relative flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-tr from-brand-600 via-brand-500 to-emerald-400 p-3 text-white shadow-xl shadow-brand-600/30 hover:scale-105 active:scale-95 hover:shadow-2xl transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-brand-500/30"
             aria-label="Open Kigali EV AI Chatbot"
           >
             <Bot className="h-7 w-7 text-white transition-transform group-hover:rotate-6" />
@@ -307,17 +307,17 @@ export function AIChatbot() {
         </div>
       )}
 
-      {/* Floating Chat Modal Window */}
+      {/* Floating Chat Window (Fullscreen native feel on mobile, floating widget on desktop) */}
       {isOpen && (
         <div
-          className={`fixed z-40 transition-all duration-200 ${
+          className={`fixed z-50 transition-all duration-200 ${
             isMinimized
-              ? 'bottom-5 right-5 w-72 h-14'
-              : 'bottom-4 right-4 sm:bottom-6 sm:right-6 w-[calc(100vw-32px)] sm:w-[420px] md:w-[440px] h-[85vh] sm:h-[620px] max-h-[85vh]'
-          } flex flex-col rounded-3xl bg-white shadow-2xl border border-slate-200/90 overflow-hidden animate-in zoom-in-95 duration-150`}
+              ? 'bottom-4 right-4 sm:bottom-6 sm:right-6 w-72 h-14 rounded-2xl shadow-xl border border-slate-200'
+              : 'inset-0 sm:inset-auto sm:bottom-6 sm:right-6 w-full h-[100dvh] sm:w-[420px] sm:h-[620px] sm:max-h-[85vh] sm:rounded-3xl sm:border sm:border-slate-200/90 sm:shadow-2xl'
+          } flex flex-col bg-white overflow-hidden animate-in zoom-in-95 duration-150`}
         >
           {/* Header */}
-          <div className="flex items-center justify-between border-b border-slate-100 bg-slate-900 px-4 py-3 text-white">
+          <div className="flex items-center justify-between border-b border-slate-100 bg-slate-900 px-4 py-3 text-white shrink-0 pt-safe sm:pt-3">
             <div className="flex items-center gap-2.5">
               <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-tr from-brand-600 to-emerald-400 text-white shadow-sm">
                 <Bot className="h-5 w-5" />
@@ -343,8 +343,9 @@ export function AIChatbot() {
                 <button
                   type="button"
                   onClick={handleResetChat}
-                  className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-800 hover:text-white transition-colors"
+                  className="rounded-lg p-2 text-slate-400 hover:bg-slate-800 hover:text-white transition-colors active:scale-95"
                   title="Reset conversation"
+                  aria-label="Reset conversation"
                 >
                   <RotateCcw className="h-4 w-4" />
                 </button>
@@ -353,8 +354,9 @@ export function AIChatbot() {
               <button
                 type="button"
                 onClick={() => setIsMinimized(!isMinimized)}
-                className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-800 hover:text-white transition-colors"
+                className="hidden sm:flex rounded-lg p-2 text-slate-400 hover:bg-slate-800 hover:text-white transition-colors active:scale-95"
                 title={isMinimized ? 'Expand' : 'Minimize'}
+                aria-label={isMinimized ? 'Expand' : 'Minimize'}
               >
                 {isMinimized ? (
                   <Maximize2 className="h-4 w-4" />
@@ -366,10 +368,11 @@ export function AIChatbot() {
               <button
                 type="button"
                 onClick={() => setIsOpen(false)}
-                className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-800 hover:text-white transition-colors"
+                className="rounded-lg p-2 text-slate-400 hover:bg-slate-800 hover:text-white transition-colors active:scale-95"
                 title="Close chat"
+                aria-label="Close chat"
               >
-                <X className="h-4 w-4" />
+                <X className="h-5 w-5" />
               </button>
             </div>
           </div>
@@ -494,7 +497,7 @@ export function AIChatbot() {
               )}
 
               {/* Input Area */}
-              <div className="border-t border-slate-200 bg-white p-3">
+              <div className="border-t border-slate-200 bg-white p-3 pb-safe shrink-0">
                 <form
                   onSubmit={(e) => {
                     e.preventDefault();
@@ -511,7 +514,7 @@ export function AIChatbot() {
                       maxLength={500}
                       placeholder="Ask about BYD plugs, fast chargers, tariffs..."
                       rows={1}
-                      className="w-full resize-none rounded-2xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 focus:border-brand-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 max-h-28"
+                      className="w-full resize-none rounded-2xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-base sm:text-sm text-slate-900 placeholder:text-slate-400 focus:border-brand-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 max-h-28"
                     />
                     {input.length > 350 && (
                       <span className="absolute bottom-1 right-2 text-[9px] font-medium text-slate-400">
@@ -523,7 +526,7 @@ export function AIChatbot() {
                   <button
                     type="submit"
                     disabled={!input.trim() || isLoading}
-                    className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-brand-600 text-white shadow-md hover:bg-brand-700 disabled:opacity-40 disabled:hover:bg-brand-600 transition-all"
+                    className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-brand-600 text-white shadow-md hover:bg-brand-700 active:scale-95 disabled:opacity-40 disabled:hover:bg-brand-600 transition-all"
                     aria-label="Send message"
                   >
                     <Send className="h-4 w-4" />
@@ -531,7 +534,7 @@ export function AIChatbot() {
                 </form>
 
                 <div className="mt-1.5 flex items-center justify-between text-[10px] text-slate-400 px-1">
-                  <span>Press Enter to send</span>
+                  <span>Tap send or press Enter</span>
                   <span className="flex items-center gap-1 text-brand-600 font-medium">
                     <Zap className="h-3 w-3" /> EV Guardrails Active
                   </span>

@@ -97,7 +97,7 @@ export function UserDropdown({ onAddStationClick }: UserDropdownProps) {
 
       {/* Dropdown Menu */}
       {isOpen && (
-        <div className="absolute right-0 top-full z-50 mt-2 w-72 origin-top-right rounded-3xl border border-slate-200 bg-white p-2 shadow-2xl animate-in fade-in-50 zoom-in-95 duration-150 divide-y divide-slate-100">
+        <div className="absolute right-0 top-full z-50 mt-2 w-72 max-w-[calc(100vw-24px)] origin-top-right rounded-3xl border border-slate-200 bg-white p-2 shadow-2xl animate-in fade-in-50 zoom-in-95 duration-150 divide-y divide-slate-100">
           {/* 1. User Profile Header */}
           <div className="p-3">
             <div className="flex items-center gap-3">

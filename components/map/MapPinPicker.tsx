@@ -181,15 +181,15 @@ export function MapPinPicker({
                 }
               }}
               placeholder="Search Kigali address or landmark to drop pin..."
-              className="w-full rounded-xl border border-slate-200 bg-white py-2 pl-9 pr-4 text-xs font-medium text-slate-900 shadow-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+              className="w-full rounded-xl border border-slate-200 bg-white py-2.5 sm:py-2 pl-9 pr-4 text-base sm:text-xs font-medium text-slate-900 shadow-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
             />
-            <Search className="pointer-events-none absolute left-3 top-2.5 h-3.5 w-3.5 text-slate-400" />
+            <Search className="pointer-events-none absolute left-3 top-3 sm:top-2.5 h-3.5 w-3.5 text-slate-400" />
           </div>
           <button
             type="button"
             onClick={handleSearch}
             disabled={isSearching}
-            className="flex items-center gap-1.5 rounded-xl bg-slate-900 px-3 py-2 text-xs font-semibold text-white shadow-sm hover:bg-slate-800 transition-colors disabled:opacity-50"
+            className="flex items-center gap-1.5 rounded-xl bg-slate-900 px-4 py-2.5 sm:py-2 text-xs font-semibold text-white shadow-sm hover:bg-slate-800 active:scale-95 transition-all disabled:opacity-50"
           >
             {isSearching ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : 'Find'}
           </button>
@@ -203,7 +203,7 @@ export function MapPinPicker({
                 key={idx}
                 type="button"
                 onClick={() => handleSelectSearchResult(item)}
-                className="flex w-full items-start gap-2 rounded-lg p-2 text-left hover:bg-slate-50 transition-colors"
+                className="flex min-h-[40px] w-full items-start gap-2 rounded-lg p-2.5 text-left hover:bg-slate-50 active:bg-slate-100 transition-colors"
               >
                 <MapPin className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-brand-600" />
                 <span className="truncate text-slate-700">{item.display_name}</span>

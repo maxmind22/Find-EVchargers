@@ -16,7 +16,14 @@ export async function GET(
       );
     }
 
-    return NextResponse.json({ success: true, data: station });
+    return NextResponse.json(
+      { success: true, data: station },
+      {
+        headers: {
+          'Cache-Control': 'public, max-age=60, s-maxage=120, stale-while-revalidate=600',
+        },
+      }
+    );
   } catch (error: any) {
     return NextResponse.json(
       { success: false, error: error?.message || 'Failed to fetch station' },

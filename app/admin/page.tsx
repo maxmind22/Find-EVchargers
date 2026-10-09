@@ -130,25 +130,25 @@ export default function AdminPortalPage() {
             </h1>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="w-full sm:w-auto flex flex-col sm:flex-row sm:items-center gap-3">
             {/* User Profile Dropdown & Signout */}
             <AdminUserHeader onAddStationClick={() => setActiveTab('add')} />
 
             {/* Tab Switcher */}
-            <div className="flex items-center rounded-2xl bg-slate-200/70 p-1 shadow-inner text-xs font-bold">
+            <div className="w-full sm:w-auto grid grid-cols-2 sm:flex sm:items-center rounded-2xl bg-slate-200/70 p-1 shadow-inner text-xs font-bold">
               <button
                 onClick={() => {
                   setEditingStation(null);
                   setActiveTab('list');
                 }}
-                className={`flex items-center gap-1.5 rounded-xl px-3.5 py-2 transition-all ${
+                className={`flex items-center justify-center gap-1.5 rounded-xl px-3 sm:px-3.5 py-2.5 sm:py-2 transition-all ${
                   activeTab === 'list'
                     ? 'bg-white text-slate-900 shadow-sm'
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
                 <Layers className="h-3.5 w-3.5" />
-                <span>{isSiteAdmin ? 'All Stations' : 'My Stations'} ({stations.length})</span>
+                <span>{isSiteAdmin ? 'All' : 'My'} Stations ({stations.length})</span>
               </button>
 
               <button
@@ -156,7 +156,7 @@ export default function AdminPortalPage() {
                   setEditingStation(null);
                   setActiveTab('add');
                 }}
-                className={`flex items-center gap-1.5 rounded-xl px-3.5 py-2 transition-all ${
+                className={`flex items-center justify-center gap-1.5 rounded-xl px-3 sm:px-3.5 py-2.5 sm:py-2 transition-all ${
                   activeTab === 'add'
                     ? 'bg-white text-slate-900 shadow-sm'
                     : 'text-slate-600 hover:text-slate-900'
@@ -182,13 +182,13 @@ export default function AdminPortalPage() {
 
         {/* Tab Content: 2. Add / Edit Station */}
         {activeTab === 'add' && (
-          <div className="rounded-3xl bg-white p-6 shadow-sm border border-slate-200">
+          <div className="rounded-3xl bg-white p-4 sm:p-6 shadow-sm border border-slate-200">
             <div className="mb-6 flex items-center justify-between border-b border-slate-100 pb-4">
               <div>
-                <h2 className="text-lg font-bold text-slate-900">
+                <h2 className="text-base sm:text-lg font-bold text-slate-900">
                   {editingStation ? `Edit "${editingStation.name}"` : 'Register New Charging Station'}
                 </h2>
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-slate-500 mt-0.5">
                   {isSiteAdmin
                     ? 'Drop a pin on the Kigali map to publish a new station across the network.'
                     : 'Add your charging station to the Kigali network. You will be able to edit its info at any time.'}

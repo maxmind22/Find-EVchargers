@@ -22,7 +22,7 @@ import {
   Gauge,
   BatteryCharging,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ReportModal } from './ReportModal';
 
 interface StationDrawerProps {
@@ -44,6 +44,17 @@ const AMENITY_ICONS: Record<Amenity, { label: string; icon: React.ReactNode }> =
 export function StationDrawer({ station, onClose }: StationDrawerProps) {
   const [copiedCoords, setCopiedCoords] = useState(false);
   const [isReportOpen, setIsReportOpen] = useState(false);
+
+  // Close on Escape key
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    if (station) {
+      document.addEventListener('keydown', handleKeyDown);
+    }
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [station, onClose]);
 
   if (!station) return null;
 
@@ -100,11 +111,22 @@ export function StationDrawer({ station, onClose }: StationDrawerProps) {
 
   return (
     <>
-      <div className="fixed inset-y-0 right-0 z-40 flex w-full max-w-md flex-col bg-white shadow-2xl transition-all duration-300 sm:border-l sm:border-slate-200 animate-in slide-in-from-right">
+      {/* Backdrop overlay for dismissing */}
+      <div
+        className="fixed inset-0 z-40 bg-slate-950/40 backdrop-blur-xs transition-opacity duration-200 animate-in fade-in"
+        onClick={onClose}
+        aria-hidden="true"
+      />
+
+      {/* Sheet / Drawer Container (Bottom sheet on mobile, right drawer on desktop) */}
+      <div className="fixed inset-x-0 bottom-0 z-50 flex max-h-[88dvh] w-full flex-col rounded-t-3xl border-t border-slate-200 bg-white shadow-2xl transition-all duration-300 animate-in slide-in-from-bottom pb-safe sm:inset-y-0 sm:right-0 sm:left-auto sm:max-h-none sm:max-w-md sm:rounded-none sm:border-l sm:border-t-0 sm:slide-in-from-right">
+        {/* Mobile Drag Indicator Handle */}
+        <div className="mx-auto mt-2.5 h-1.5 w-12 shrink-0 rounded-full bg-slate-300 sm:hidden" />
+
         {/* Header */}
-        <div className="flex items-start justify-between border-b border-slate-100 p-5 pb-4">
+        <div className="flex items-start justify-between border-b border-slate-100 p-4 sm:p-5 sm:pb-4">
           <div>
-            <div className="flex items-center gap-2 mb-1.5">
+            <div className="flex items-center gap-2 mb-1">
               <span
                 className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold border ${statusConfig.bg}`}
               >
@@ -115,50 +137,51 @@ export function StationDrawer({ station, onClose }: StationDrawerProps) {
                 {station.operator_name}
               </span>
             </div>
-            <h2 className="text-xl font-bold tracking-tight text-slate-900 leading-snug">
+            <h2 className="text-lg sm:text-xl font-bold tracking-tight text-slate-900 leading-snug">
               {station.name}
             </h2>
           </div>
           <button
             onClick={onClose}
-            className="rounded-full p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors"
+            className="flex h-9 w-9 items-center justify-center rounded-full text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors active:scale-95"
+            aria-label="Close details"
           >
             <X className="h-5 w-5" />
           </button>
         </div>
 
         {/* Scrollable Content */}
-        <div className="flex-1 overflow-y-auto p-5 space-y-6 text-sm">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-5 sm:space-y-6 text-sm">
           {/* Station Power & Stalls Summary Banner */}
-          <div className="grid grid-cols-3 gap-2 rounded-2xl border border-slate-200 bg-slate-50/80 p-3 text-center">
-            <div className="rounded-xl bg-white p-2.5 shadow-sm border border-slate-100">
+          <div className="grid grid-cols-3 gap-2 rounded-2xl border border-slate-200 bg-slate-50/80 p-2.5 sm:p-3 text-center">
+            <div className="rounded-xl bg-white p-2 sm:p-2.5 shadow-sm border border-slate-100">
               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
                 Max Speed
               </span>
-              <span className="text-sm font-black text-brand-600">
+              <span className="text-sm sm:text-base font-black text-brand-600 truncate block">
                 {maxPowerKw} kW
               </span>
               <span className="text-[9px] text-slate-400 block">per car</span>
             </div>
 
-            <div className="rounded-xl bg-white p-2.5 shadow-sm border border-slate-100">
+            <div className="rounded-xl bg-white p-2 sm:p-2.5 shadow-sm border border-slate-100">
               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
                 Total Plugs
               </span>
-              <span className="text-sm font-black text-slate-900">
+              <span className="text-sm sm:text-base font-black text-slate-900 truncate block">
                 {totalStalls}
               </span>
               <span className="text-[9px] text-slate-400 block">charging bays</span>
             </div>
 
-            <div className="rounded-xl bg-white p-2.5 shadow-sm border border-slate-100">
+            <div className="rounded-xl bg-white p-2 sm:p-2.5 shadow-sm border border-slate-100">
               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
                 Total Hub
               </span>
-              <span className="text-sm font-black text-emerald-600">
+              <span className="text-sm sm:text-base font-black text-emerald-600 truncate block">
                 {totalHubPowerKw} kW
               </span>
-              <span className="text-[9px] text-slate-400 block">combined grid</span>
+              <span className="text-[9px] text-slate-400 block">combined</span>
             </div>
           </div>
 
@@ -175,24 +198,24 @@ export function StationDrawer({ station, onClose }: StationDrawerProps) {
             </div>
 
             {/* Navigation CTA Buttons */}
-            <div className="pt-2 flex flex-col gap-2">
+            <div className="pt-1 flex flex-col gap-2">
               <div className="grid grid-cols-2 gap-2">
                 <a
                   href={navUrls.googleMaps}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-center gap-1.5 rounded-xl bg-brand-600 px-3 py-2.5 text-xs font-bold text-white shadow-sm hover:bg-brand-700 transition-colors"
+                  className="flex min-h-[44px] items-center justify-center gap-1.5 rounded-xl bg-brand-600 px-3 py-2.5 text-xs font-bold text-white shadow-sm hover:bg-brand-700 active:scale-98 transition-all"
                 >
-                  <Navigation className="h-3.5 w-3.5" />
+                  <Navigation className="h-4 w-4" />
                   <span>Google Maps</span>
                 </a>
                 <a
                   href={navUrls.appleMaps}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-center gap-1.5 rounded-xl bg-slate-900 px-3 py-2.5 text-xs font-bold text-white shadow-sm hover:bg-slate-800 transition-colors"
+                  className="flex min-h-[44px] items-center justify-center gap-1.5 rounded-xl bg-slate-900 px-3 py-2.5 text-xs font-bold text-white shadow-sm hover:bg-slate-800 active:scale-98 transition-all"
                 >
-                  <ExternalLink className="h-3.5 w-3.5" />
+                  <ExternalLink className="h-4 w-4" />
                   <span>Apple Maps</span>
                 </a>
               </div>

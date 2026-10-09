@@ -45,17 +45,17 @@ export default function AboutPage() {
             EVchargers is Rwanda&apos;s dedicated open map and management network for EV drivers, fleet operators, and charging station hosts. We eliminate range anxiety with real-time connector data, verified pricing, and instant navigation.
           </p>
 
-          <div className="flex flex-wrap items-center justify-center gap-3 pt-4">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-4 w-full">
             <Link
               href="/"
-              className="inline-flex items-center gap-2 rounded-2xl bg-brand-500 px-6 py-3 text-sm font-bold text-slate-950 shadow-lg shadow-brand-500/25 hover:bg-brand-400 hover:scale-[1.02] transition-all"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-2xl bg-brand-500 px-6 py-3.5 text-sm font-bold text-slate-950 shadow-lg shadow-brand-500/25 hover:bg-brand-400 active:scale-98 transition-all"
             >
               <MapPin className="h-4 w-4" />
               <span>Explore Live Map</span>
             </Link>
             <Link
               href="/admin"
-              className="inline-flex items-center gap-2 rounded-2xl border border-slate-700 bg-slate-800/80 px-6 py-3 text-sm font-bold text-white hover:bg-slate-700 transition-all backdrop-blur-sm"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-700 bg-slate-800/80 px-6 py-3.5 text-sm font-bold text-white hover:bg-slate-700 active:scale-98 transition-all backdrop-blur-sm"
             >
               <PlusCircle className="h-4 w-4 text-emerald-400" />
               <span>Register a Charger</span>

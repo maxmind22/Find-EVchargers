@@ -243,7 +243,7 @@ export function AdminStationForm({
       </div>
 
       {/* 2. Station Metadata */}
-      <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm space-y-4">
+      <div className="rounded-3xl border border-slate-200 bg-white p-4 sm:p-5 shadow-sm space-y-4">
         <h3 className="text-sm font-bold text-slate-900 flex items-center gap-1.5">
           <Info className="h-4 w-4 text-brand-600" />
           2. Station Information
@@ -258,7 +258,7 @@ export function AdminStationForm({
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g., Kigali Convention Centre Fast Hub"
-              className="w-full rounded-xl border border-slate-200 p-2.5 text-xs text-slate-900 focus:border-brand-500 focus:outline-none"
+              className="w-full rounded-xl border border-slate-200 p-2.5 text-base sm:text-xs text-slate-900 focus:border-brand-500 focus:outline-none"
             />
           </div>
 
@@ -269,7 +269,7 @@ export function AdminStationForm({
               value={operatorName}
               onChange={(e) => setOperatorName(e.target.value)}
               placeholder="e.g., REG, Ampersand, Spiro, BasiGo"
-              className="w-full rounded-xl border border-slate-200 p-2.5 text-xs text-slate-900 focus:border-brand-500 focus:outline-none"
+              className="w-full rounded-xl border border-slate-200 p-2.5 text-base sm:text-xs text-slate-900 focus:border-brand-500 focus:outline-none"
             />
           </div>
 
@@ -281,7 +281,7 @@ export function AdminStationForm({
               value={address}
               onChange={(e) => setAddress(e.target.value)}
               placeholder="e.g., KG 2 Roundabout, Kimihurura, Kigali"
-              className="w-full rounded-xl border border-slate-200 p-2.5 text-xs text-slate-900 focus:border-brand-500 focus:outline-none"
+              className="w-full rounded-xl border border-slate-200 p-2.5 text-base sm:text-xs text-slate-900 focus:border-brand-500 focus:outline-none"
             />
           </div>
 
@@ -290,7 +290,7 @@ export function AdminStationForm({
             <select
               value={status}
               onChange={(e) => setStatus(e.target.value as StationStatus)}
-              className="w-full rounded-xl border border-slate-200 p-2.5 text-xs text-slate-900 focus:border-brand-500 focus:outline-none"
+              className="w-full rounded-xl border border-slate-200 p-2.5 text-base sm:text-xs text-slate-900 focus:border-brand-500 focus:outline-none"
             >
               <option value="ACTIVE">Operational / Active</option>
               <option value="MAINTENANCE">Under Maintenance</option>
@@ -304,7 +304,7 @@ export function AdminStationForm({
             <select
               value={accessType}
               onChange={(e) => setAccessType(e.target.value as AccessType)}
-              className="w-full rounded-xl border border-slate-200 p-2.5 text-xs text-slate-900 focus:border-brand-500 focus:outline-none"
+              className="w-full rounded-xl border border-slate-200 p-2.5 text-base sm:text-xs text-slate-900 focus:border-brand-500 focus:outline-none"
             >
               <option value="PUBLIC">Public Access (24/7)</option>
               <option value="CUSTOMERS_ONLY">Customers / Shoppers Only</option>
@@ -320,19 +320,19 @@ export function AdminStationForm({
               value={pricingInfo}
               onChange={(e) => setPricingInfo(e.target.value)}
               placeholder="e.g., 280 RWF / kWh or Free for customers"
-              className="w-full rounded-xl border border-slate-200 p-2.5 text-xs text-slate-900 focus:border-brand-500 focus:outline-none"
+              className="w-full rounded-xl border border-slate-200 p-2.5 text-base sm:text-xs text-slate-900 focus:border-brand-500 focus:outline-none"
             />
           </div>
 
-          <div className="flex items-center gap-3 pt-6">
+          <div className="flex items-center gap-3 pt-2 sm:pt-6">
             <input
               type="checkbox"
               id="isFreeCheckbox"
               checked={isFree}
               onChange={(e) => setIsFree(e.target.checked)}
-              className="h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500 cursor-pointer"
+              className="h-5 w-5 rounded border-slate-300 text-brand-600 focus:ring-brand-500 cursor-pointer"
             />
-            <label htmlFor="isFreeCheckbox" className="font-semibold text-slate-700 cursor-pointer">
+            <label htmlFor="isFreeCheckbox" className="font-semibold text-slate-700 cursor-pointer text-xs">
               100% Free Charging Station
             </label>
           </div>
@@ -340,12 +340,12 @@ export function AdminStationForm({
       </div>
 
       {/* 3. Multi-Plug Connectors */}
-      <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+      <div className="rounded-3xl border border-slate-200 bg-white p-4 sm:p-5 shadow-sm">
         <ConnectorBuilder connectors={connectors} onChange={setConnectors} />
       </div>
 
       {/* 4. Amenities & Notes */}
-      <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm space-y-4 text-xs">
+      <div className="rounded-3xl border border-slate-200 bg-white p-4 sm:p-5 shadow-sm space-y-4 text-xs">
         <div>
           <label className="mb-2 block font-semibold text-slate-700">
             Available Amenities On-Site
@@ -358,7 +358,7 @@ export function AdminStationForm({
                   type="button"
                   key={am.id}
                   onClick={() => toggleAmenity(am.id)}
-                  className={`rounded-xl p-2.5 text-left border transition-all ${
+                  className={`min-h-[42px] rounded-xl p-2.5 text-left border transition-all active:scale-98 ${
                     isChecked
                       ? 'border-brand-500 bg-brand-50 text-brand-900 font-semibold shadow-sm'
                       : 'border-slate-200 hover:bg-slate-50 text-slate-700'
@@ -380,18 +380,18 @@ export function AdminStationForm({
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             placeholder="e.g., Located near main gate, security operates the barrier..."
-            className="w-full rounded-xl border border-slate-200 p-2.5 text-xs text-slate-900 focus:border-brand-500 focus:outline-none"
+            className="w-full rounded-xl border border-slate-200 p-2.5 text-base sm:text-xs text-slate-900 focus:border-brand-500 focus:outline-none"
           />
         </div>
       </div>
 
       {/* Actions */}
-      <div className="flex items-center justify-end gap-3 pt-2">
+      <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-end gap-2.5 sm:gap-3 pt-2">
         {onCancel && (
           <button
             type="button"
             onClick={onCancel}
-            className="rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors"
+            className="w-full sm:w-auto flex items-center justify-center min-h-[44px] rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-xs font-bold text-slate-700 hover:bg-slate-50 active:scale-98 transition-all"
           >
             Cancel
           </button>
@@ -399,7 +399,7 @@ export function AdminStationForm({
         <button
           type="submit"
           disabled={isSubmitting}
-          className="flex items-center gap-2 rounded-xl bg-brand-600 px-6 py-2.5 text-xs font-bold text-white shadow-md shadow-brand-500/20 hover:bg-brand-700 transition-all disabled:opacity-50"
+          className="w-full sm:w-auto flex items-center justify-center gap-2 min-h-[44px] rounded-xl bg-brand-600 px-6 py-2.5 text-xs font-bold text-white shadow-md shadow-brand-500/20 hover:bg-brand-700 active:scale-98 transition-all disabled:opacity-50"
         >
           {isSubmitting ? (
             <Loader2 className="h-4 w-4 animate-spin" />

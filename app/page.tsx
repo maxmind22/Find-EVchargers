@@ -1,28 +1,58 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import { BoundingBox, Station, StationFilter } from '@/lib/types';
 import { FilterBar } from '@/components/user/FilterBar';
 import { SearchBox } from '@/components/user/SearchBox';
-import { StationDrawer } from '@/components/user/StationDrawer';
 import { Loader2 } from 'lucide-react';
 
-// Dynamically import EVMap (Leaflet - 100% Free, Zero API Keys Required)
+// Dynamically import heavy StationDrawer only when needed (reducing initial page JS bundle)
+const StationDrawer = dynamic(
+  () => import('@/components/user/StationDrawer').then((mod) => mod.StationDrawer),
+  { ssr: false }
+);
+
+// Dynamically import EVMap (Leaflet) with a fast, instant map skeleton fallback
 const EVMap = dynamic(
   () => import('@/components/map/EVMap').then((mod) => mod.EVMap),
   {
     ssr: false,
     loading: () => (
-      <div className="flex h-full w-full items-center justify-center bg-slate-100 text-slate-400">
-        <div className="flex flex-col items-center gap-2">
-          <Loader2 className="h-8 w-8 animate-spin text-brand-600" />
-          <span className="text-xs font-semibold text-slate-500">Loading Map...</span>
+      <div className="relative flex h-full w-full items-center justify-center bg-slate-950 overflow-hidden">
+        {/* Subtle Map Grid Lines Simulation */}
+        <div
+          className="absolute inset-0 opacity-15"
+          style={{
+            backgroundImage: 'radial-gradient(circle at 1px 1px, #38bdf8 1px, transparent 0)',
+            backgroundSize: '36px 36px',
+          }}
+        />
+        {/* Animated Radar Pulse */}
+        <div className="relative flex flex-col items-center gap-3 z-10">
+          <div className="relative flex h-16 w-16 items-center justify-center">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-500/30" />
+            <div className="relative flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-600/90 text-white shadow-xl backdrop-blur-sm border border-brand-400/40">
+              <Loader2 className="h-6 w-6 animate-spin text-white" />
+            </div>
+          </div>
+          <div className="flex flex-col items-center text-center px-4">
+            <span className="text-sm font-bold text-white tracking-tight">Loading Kigali EV Map</span>
+            <span className="text-xs text-slate-400">Connecting live stations and chargers...</span>
+          </div>
         </div>
       </div>
     ),
   }
 );
+
+// Client-side in-memory cache for ultra-fast station filtering & panning
+interface CacheEntry {
+  data: Station[];
+  timestamp: number;
+}
+const stationCache = new Map<string, CacheEntry>();
+const CACHE_TTL_MS = 60 * 1000; // 60 seconds
 
 export default function DriverMapPage() {
   const [stations, setStations] = useState<Station[]>([]);
@@ -32,45 +62,72 @@ export default function DriverMapPage() {
   const [flyToLocation, setFlyToLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Fetch stations based on bounding box and filters
+  const abortControllerRef = useRef<AbortController | null>(null);
+  const boundsTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const isInitialLoadedRef = useRef(false);
+
+  // Fetch stations with instant client caching & AbortController support
   const fetchStations = useCallback(
     async (bounds?: BoundingBox | null, activeFilters?: StationFilter) => {
+      const params = new URLSearchParams();
+
+      if (bounds) {
+        // Round bounding coordinates to 3 decimals (~100m) to maximize cache hits while panning
+        params.set('minLng', bounds.minLng.toFixed(3));
+        params.set('minLat', bounds.minLat.toFixed(3));
+        params.set('maxLng', bounds.maxLng.toFixed(3));
+        params.set('maxLat', bounds.maxLat.toFixed(3));
+      }
+
+      const f = activeFilters || filters;
+      if (f.connectorTypes && f.connectorTypes.length > 0) {
+        params.set('connectors', f.connectorTypes.join(','));
+      }
+      if (f.minPowerKw) {
+        params.set('minPower', f.minPowerKw.toString());
+      }
+      if (f.status && f.status.length > 0) {
+        params.set('status', f.status.join(','));
+      }
+      if (f.isFree) {
+        params.set('isFree', 'true');
+      }
+      if (f.query) {
+        params.set('q', f.query);
+      }
+
+      const cacheKey = params.toString();
+
+      // Check instant memory cache
+      const cached = stationCache.get(cacheKey);
+      if (cached && Date.now() - cached.timestamp < CACHE_TTL_MS) {
+        setStations(cached.data);
+        setIsLoading(false);
+        return;
+      }
+
+      // Abort any ongoing superseded request
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+      const controller = new AbortController();
+      abortControllerRef.current = controller;
+
       try {
         setIsLoading(true);
-        const params = new URLSearchParams();
-
-        if (bounds) {
-          params.set('minLng', bounds.minLng.toString());
-          params.set('minLat', bounds.minLat.toString());
-          params.set('maxLng', bounds.maxLng.toString());
-          params.set('maxLat', bounds.maxLat.toString());
-        }
-
-        const f = activeFilters || filters;
-        if (f.connectorTypes && f.connectorTypes.length > 0) {
-          params.set('connectors', f.connectorTypes.join(','));
-        }
-        if (f.minPowerKw) {
-          params.set('minPower', f.minPowerKw.toString());
-        }
-        if (f.status && f.status.length > 0) {
-          params.set('status', f.status.join(','));
-        }
-        if (f.isFree) {
-          params.set('isFree', 'true');
-        }
-        if (f.query) {
-          params.set('q', f.query);
-        }
-
-        const res = await fetch(`/api/stations?${params.toString()}`);
+        const res = await fetch(`/api/stations?${cacheKey}`, {
+          signal: controller.signal,
+        });
         const json = await res.json();
 
         if (json.success && Array.isArray(json.data)) {
+          stationCache.set(cacheKey, { data: json.data, timestamp: Date.now() });
           setStations(json.data);
         }
-      } catch (err) {
-        console.warn('Error fetching stations:', err);
+      } catch (err: any) {
+        if (err?.name !== 'AbortError') {
+          console.warn('Error fetching stations:', err);
+        }
       } finally {
         setIsLoading(false);
       }
@@ -80,6 +137,7 @@ export default function DriverMapPage() {
 
   // Initial load
   useEffect(() => {
+    isInitialLoadedRef.current = true;
     fetchStations(currentBounds, filters);
   }, [filters]);
 
@@ -140,10 +198,19 @@ export default function DriverMapPage() {
     };
   }, []);
 
-  const handleBoundsChange = (bounds: BoundingBox) => {
-    setCurrentBounds(bounds);
-    fetchStations(bounds, filters);
-  };
+  // Debounced bounds change handler to prevent network spam while dragging/zooming
+  const handleBoundsChange = useCallback(
+    (bounds: BoundingBox) => {
+      setCurrentBounds(bounds);
+      if (boundsTimerRef.current) {
+        clearTimeout(boundsTimerRef.current);
+      }
+      boundsTimerRef.current = setTimeout(() => {
+        fetchStations(bounds, filters);
+      }, 200);
+    },
+    [fetchStations, filters]
+  );
 
   const handleSelectLocation = (loc: { lat: number; lng: number; displayName: string }) => {
     // 1. Instantly fly map to the selected place
@@ -168,7 +235,7 @@ export default function DriverMapPage() {
   return (
     <div className="relative h-full w-full">
       {/* Top Floating Controls (Search Bar & Filter Bar) */}
-      <div className="pointer-events-none absolute top-4 left-4 right-4 z-20 flex flex-col gap-3 sm:max-w-2xl sm:left-6">
+      <div className="pointer-events-none absolute top-3 left-3 right-3 z-20 flex flex-col gap-2 sm:top-4 sm:left-6 sm:right-auto sm:max-w-2xl sm:gap-3">
         <div className="pointer-events-auto">
           <SearchBox
             stations={stations}
@@ -188,9 +255,9 @@ export default function DriverMapPage() {
 
       {/* Loading Overlay Badge */}
       {isLoading && (
-        <div className="absolute top-4 right-4 z-20 flex items-center gap-2 rounded-full bg-white/95 px-3.5 py-1.5 text-xs font-semibold text-slate-700 shadow-md backdrop-blur-md border border-slate-200/80 animate-in fade-in">
-          <Loader2 className="h-3.5 w-3.5 animate-spin text-brand-600" />
-          <span>Searching area...</span>
+        <div className="pointer-events-none absolute bottom-6 left-1/2 -translate-x-1/2 sm:bottom-auto sm:top-4 sm:right-6 sm:left-auto sm:translate-x-0 z-30 flex items-center gap-2 rounded-full bg-slate-900/90 text-white px-3.5 py-1.5 text-xs font-semibold shadow-lg backdrop-blur-md border border-slate-700/80 animate-in fade-in">
+          <Loader2 className="h-3.5 w-3.5 animate-spin text-brand-400" />
+          <span>Searching Kigali area...</span>
         </div>
       )}
 
@@ -203,11 +270,13 @@ export default function DriverMapPage() {
         flyToLocation={flyToLocation}
       />
 
-      {/* Station Details Drawer */}
-      <StationDrawer
-        station={selectedStation}
-        onClose={() => setSelectedStation(null)}
-      />
+      {/* Station Details Drawer - loaded on demand */}
+      {selectedStation && (
+        <StationDrawer
+          station={selectedStation}
+          onClose={() => setSelectedStation(null)}
+        />
+      )}
     </div>
   );
 }

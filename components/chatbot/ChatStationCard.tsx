@@ -128,19 +128,19 @@ export function ChatStationCard({ station, onSelectStation }: ChatStationCardPro
             href={navUrls.googleMaps}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-1 rounded-lg bg-slate-100 px-2 py-1 text-[11px] font-medium text-slate-700 hover:bg-slate-200 transition-colors"
+            className="flex min-h-[36px] items-center gap-1 rounded-xl bg-slate-100 px-2.5 py-1.5 text-[11px] font-semibold text-slate-700 hover:bg-slate-200 active:scale-95 transition-all"
             title="Directions"
           >
-            <Navigation className="h-3 w-3" />
+            <Navigation className="h-3.5 w-3.5" />
             <span>Map</span>
           </a>
 
           <button
             type="button"
             onClick={handleLocateOnMap}
-            className="flex items-center gap-1 rounded-lg bg-brand-600 px-2.5 py-1 text-[11px] font-bold text-white shadow-sm hover:bg-brand-700 transition-colors"
+            className="flex min-h-[36px] items-center gap-1 rounded-xl bg-brand-600 px-3 py-1.5 text-[11px] font-bold text-white shadow-sm hover:bg-brand-700 active:scale-95 transition-all"
           >
-            <ExternalLink className="h-3 w-3" />
+            <ExternalLink className="h-3.5 w-3.5" />
             <span>Locate</span>
           </button>
         </div>

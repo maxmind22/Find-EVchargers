@@ -11,26 +11,36 @@ export async function GET(request: NextRequest) {
     'Accept-Language': 'en',
   };
 
+  const cacheHeaders = {
+    'Cache-Control': 'public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800',
+  };
+
   try {
     // Reverse Geocoding (Coordinates -> Address)
     if (lat && lng) {
       const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`;
-      const res = await fetch(url, { headers });
+      const res = await fetch(url, {
+        headers,
+        next: { revalidate: 86400 },
+      });
       if (!res.ok) {
         throw new Error(`Nominatim error: ${res.statusText}`);
       }
       const data = await res.json();
-      return NextResponse.json({
-        success: true,
-        data: {
-          display_name: data.display_name,
-          address: data.display_name,
-          city: data.address?.city || data.address?.town || data.address?.village || data.address?.state || 'Kigali',
-          country: data.address?.country || 'Rwanda',
-          latitude: parseFloat(lat),
-          longitude: parseFloat(lng),
+      return NextResponse.json(
+        {
+          success: true,
+          data: {
+            display_name: data.display_name,
+            address: data.display_name,
+            city: data.address?.city || data.address?.town || data.address?.village || data.address?.state || 'Kigali',
+            country: data.address?.country || 'Rwanda',
+            latitude: parseFloat(lat),
+            longitude: parseFloat(lng),
+          },
         },
-      });
+        { headers: cacheHeaders }
+      );
     }
 
     // Forward Geocoding (Address/Query -> Coordinates)
@@ -39,7 +49,10 @@ export async function GET(request: NextRequest) {
       const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
         q
       )}&limit=6&addressdetails=1&countrycodes=rw,ke,ug,tz`;
-      const res = await fetch(url, { headers });
+      const res = await fetch(url, {
+        headers,
+        next: { revalidate: 86400 },
+      });
       if (!res.ok) {
         throw new Error(`Nominatim error: ${res.statusText}`);
       }
@@ -52,10 +65,13 @@ export async function GET(request: NextRequest) {
         country: item.address?.country || 'Rwanda',
       }));
 
-      return NextResponse.json({
-        success: true,
-        data: results,
-      });
+      return NextResponse.json(
+        {
+          success: true,
+          data: results,
+        },
+        { headers: cacheHeaders }
+      );
     }
 
     return NextResponse.json(

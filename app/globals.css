@@ -29,21 +29,27 @@ body {
   z-index: 15 !important;
 }
 
-/* Custom Marker Styles */
+/* Custom Marker Styles (GPU accelerated) */
 .custom-leaflet-marker {
   background: transparent;
   border: none;
   cursor: pointer;
+  will-change: transform;
+  transform: translateZ(0);
   transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
+.leaflet-tile {
+  will-change: transform, opacity;
+}
+
 .custom-leaflet-marker:hover {
-  transform: scale(1.15);
+  transform: scale(1.15) translateZ(0);
   z-index: 1000 !important;
 }
 
 .custom-leaflet-marker.selected {
-  transform: scale(1.22);
+  transform: scale(1.22) translateZ(0);
   z-index: 1100 !important;
 }
 
@@ -90,4 +96,30 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+/* Mobile Touch Optimization */
+button, a, input, select, textarea {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Safe Area Insets for mobile devices with notches / home indicators */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.pt-safe {
+  padding-top: env(safe-area-inset-top, 0px);
 }

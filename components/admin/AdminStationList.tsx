@@ -124,26 +124,26 @@ export function AdminStationList({
         </div>
       </div>
 
-      {/* Control Bar (Search + Filter + Seed) */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex flex-1 items-center gap-2">
-          <div className="relative flex-1 max-w-sm">
-            <Search className="pointer-events-none absolute left-3 top-2.5 h-3.5 w-3.5 text-slate-400" />
+      {/* Control Bar (Search + Filter) */}
+      <div className="flex flex-col gap-2.5 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col sm:flex-row flex-1 sm:items-center gap-2">
+          <div className="relative flex-1 sm:max-w-sm">
+            <Search className="pointer-events-none absolute left-3 top-3 sm:top-2.5 h-3.5 w-3.5 text-slate-400" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Filter by name, address, operator, or owner..."
-              className="w-full rounded-xl border border-slate-200 bg-white py-2 pl-9 pr-4 text-xs font-medium text-slate-900 shadow-sm focus:border-brand-500 focus:outline-none"
+              placeholder="Search station, address, or operator..."
+              className="w-full rounded-xl border border-slate-200 bg-white py-2.5 sm:py-2 pl-9 pr-4 text-base sm:text-xs font-medium text-slate-900 shadow-sm focus:border-brand-500 focus:outline-none"
             />
           </div>
 
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 shadow-sm focus:border-brand-500 focus:outline-none"
+            className="rounded-xl border border-slate-200 bg-white px-3 py-2.5 sm:py-2 text-base sm:text-xs font-medium text-slate-700 shadow-sm focus:border-brand-500 focus:outline-none"
           >
-            <option value="ALL">All Statuses</option>
+            <option value="ALL">All Operational Statuses</option>
             <option value="ACTIVE">Active Only</option>
             <option value="MAINTENANCE">Maintenance Only</option>
             <option value="OFFLINE">Offline Only</option>
@@ -151,7 +151,7 @@ export function AdminStationList({
         </div>
       </div>
 
-      {/* Data Table */}
+      {/* Data Container: Mobile Cards (< sm) & Desktop Table (>= sm) */}
       <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
         {isLoading ? (
           <div className="flex items-center justify-center py-16 text-slate-400">
@@ -174,7 +174,7 @@ export function AdminStationList({
             {onAddNew && (
               <button
                 onClick={onAddNew}
-                className="flex items-center gap-1.5 rounded-xl bg-brand-600 px-4 py-2 text-xs font-bold text-white shadow-md hover:bg-brand-700 transition-colors"
+                className="flex items-center gap-1.5 rounded-xl bg-brand-600 px-4 py-2 text-xs font-bold text-white shadow-md hover:bg-brand-700 active:scale-95 transition-all"
               >
                 <PlusCircle className="h-4 w-4" />
                 <span>Add Your First Station</span>
@@ -182,90 +182,77 @@ export function AdminStationList({
             )}
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
-              <thead className="border-b border-slate-200 bg-slate-50/70 font-bold uppercase tracking-wider text-slate-500 text-[10px]">
-                <tr>
-                  <th className="px-4 py-3.5">Station & Operator</th>
-                  {isSiteAdmin && <th className="px-4 py-3.5">Owner / Host</th>}
-                  <th className="px-4 py-3.5">Coordinates & City</th>
-                  <th className="px-4 py-3.5">Plugs & Speeds</th>
-                  <th className="px-4 py-3.5">Pricing</th>
-                  <th className="px-4 py-3.5">Status</th>
-                  <th className="px-4 py-3.5 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
-                {filtered.map((station) => (
-                  <tr key={station.id} className="hover:bg-slate-50/80 transition-colors">
-                    <td className="px-4 py-3.5">
-                      <div className="font-bold text-slate-900 text-sm">{station.name}</div>
-                      <div className="text-[11px] text-slate-400">{station.operator_name}</div>
-                      <div className="text-[11px] text-slate-500 truncate max-w-xs">{station.address}</div>
-                    </td>
+          <>
+            {/* 1. Mobile Card List (< sm screens) */}
+            <div className="divide-y divide-slate-100 sm:hidden">
+              {filtered.map((station) => {
+                const totalHubKw =
+                  station.connectors?.reduce(
+                    (acc, c) => acc + (c.power_kw * (c.quantity || 1)),
+                    0
+                  ) || 0;
+                const totalBays =
+                  station.connectors?.reduce((acc, c) => acc + (c.quantity || 1), 0) || 0;
 
-                    {isSiteAdmin && (
-                      <td className="px-4 py-3.5 whitespace-nowrap">
-                        <span className="inline-flex items-center gap-1 rounded-md bg-slate-100 px-2 py-0.5 text-[11px] font-mono text-slate-700">
-                          <User className="h-3 w-3 text-slate-400" />
-                          {station.user_email || 'admin@evchargers.rw'}
-                        </span>
-                      </td>
-                    )}
-
-                    <td className="px-4 py-3.5 font-mono text-[11px] text-slate-500 whitespace-nowrap">
-                      <div>
-                        {station.latitude.toFixed(4)}, {station.longitude.toFixed(4)}
-                      </div>
-                      <span className="font-sans text-[10px] text-slate-400 font-medium">
-                        {station.city || 'Kigali'}
-                      </span>
-                    </td>
-
-                    <td className="px-4 py-3.5">
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-1.5 font-bold text-slate-800 text-[11px]">
-                          <Zap className="h-3 w-3 text-brand-600" />
-                          <span>
-                            {station.connectors?.reduce((acc, c) => acc + (c.power_kw * (c.quantity || 1)), 0) || 0} kW Hub Total
-                          </span>
-                          <span className="text-[10px] text-slate-400 font-normal">
-                            ({station.connectors?.reduce((acc, c) => acc + (c.quantity || 1), 0) || 0} bays)
-                          </span>
+                return (
+                  <div key={station.id} className="p-4 space-y-3">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-1.5">
+                          <h3 className="font-bold text-slate-900 text-sm truncate">
+                            {station.name}
+                          </h3>
                         </div>
-                        <div className="flex flex-wrap gap-1">
-                          {station.connectors?.map((c, i) => (
-                            <span
-                              key={i}
-                              className="inline-flex items-center gap-1 rounded-md bg-slate-100 px-1.5 py-0.5 text-[10px] font-semibold text-slate-700"
-                            >
-                              {c.quantity}x {c.power_kw} kW {c.connector_type === 'GB_T' ? 'GB/T' : c.connector_type.replace('_', ' ')}
-                            </span>
-                          ))}
-                        </div>
+                        <p className="text-xs text-slate-500 font-medium">{station.operator_name}</p>
+                        <p className="text-xs text-slate-400 truncate mt-0.5">{station.address}</p>
                       </div>
-                    </td>
 
-                    <td className="px-4 py-3.5 whitespace-nowrap">
-                      {station.is_free ? (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-700">
-                          <Sparkles className="h-2.5 w-2.5" />
-                          Free
-                        </span>
-                      ) : (
-                        <span className="text-slate-700 text-xs font-semibold">
-                          {station.pricing_info}
-                        </span>
-                      )}
-                    </td>
+                      <div className="shrink-0 text-right">
+                        {station.is_free ? (
+                          <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-700 border border-emerald-100">
+                            <Sparkles className="h-2.5 w-2.5" />
+                            Free
+                          </span>
+                        ) : (
+                          <span className="rounded-md bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-slate-700">
+                            {station.pricing_info || 'Standard Rate'}
+                          </span>
+                        )}
+                      </div>
+                    </div>
 
-                    <td className="px-4 py-3.5 whitespace-nowrap">
+                    {/* Plugs and Power Summary */}
+                    <div className="rounded-2xl bg-slate-50 p-2.5 border border-slate-100 space-y-2">
+                      <div className="flex items-center justify-between text-xs font-bold text-slate-800">
+                        <span className="flex items-center gap-1">
+                          <Zap className="h-3.5 w-3.5 text-brand-600" />
+                          <span>{totalHubKw} kW Total Capacity</span>
+                        </span>
+                        <span className="text-[11px] font-medium text-slate-500">
+                          {totalBays} {totalBays === 1 ? 'stall' : 'stalls'}
+                        </span>
+                      </div>
+
+                      <div className="flex flex-wrap gap-1">
+                        {station.connectors?.map((c, i) => (
+                          <span
+                            key={i}
+                            className="inline-flex items-center gap-1 rounded-lg bg-white px-2 py-1 text-[10px] font-semibold text-slate-700 shadow-2xs border border-slate-200/80"
+                          >
+                            {c.quantity}x {c.power_kw} kW {c.connector_type === 'GB_T' ? 'GB/T' : c.connector_type.replace('_', ' ')}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Status & Actions Controls Row */}
+                    <div className="flex items-center justify-between pt-1">
                       <select
                         value={station.status}
                         onChange={(e) =>
                           handleStatusChange(station.id, e.target.value as StationStatus)
                         }
-                        className={`rounded-lg border px-2 py-1 text-[11px] font-bold cursor-pointer focus:outline-none ${
+                        className={`rounded-xl border px-3 py-1.5 text-xs font-bold cursor-pointer focus:outline-none ${
                           station.status === 'ACTIVE'
                             ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
                             : station.status === 'MAINTENANCE'
@@ -277,36 +264,161 @@ export function AdminStationList({
                         <option value="MAINTENANCE">Maintenance</option>
                         <option value="OFFLINE">Offline</option>
                       </select>
-                    </td>
 
-                    <td className="px-4 py-3.5 text-right whitespace-nowrap">
-                      <div className="flex items-center justify-end gap-1">
+                      <div className="flex items-center gap-1.5">
                         <button
                           onClick={() => onEditStation(station)}
-                          title="Edit Station"
-                          className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition-colors"
+                          className="flex min-h-[36px] items-center gap-1 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 active:scale-95 shadow-2xs"
                         >
-                          <Edit2 className="h-4 w-4" />
+                          <Edit2 className="h-3.5 w-3.5" />
+                          <span>Edit</span>
                         </button>
                         <button
                           onClick={() => handleDelete(station.id, station.name)}
                           disabled={deletingId === station.id}
-                          title="Delete Station"
-                          className="rounded-lg p-1.5 text-slate-400 hover:bg-rose-50 hover:text-rose-600 transition-colors disabled:opacity-50"
+                          className="flex min-h-[36px] items-center gap-1 rounded-xl border border-rose-200 bg-rose-50/70 px-3 py-1.5 text-xs font-semibold text-rose-700 hover:bg-rose-100 active:scale-95 disabled:opacity-50"
                         >
                           {deletingId === station.id ? (
-                            <Loader2 className="h-4 w-4 animate-spin text-rose-600" />
+                            <Loader2 className="h-3.5 w-3.5 animate-spin text-rose-600" />
                           ) : (
-                            <Trash2 className="h-4 w-4" />
+                            <Trash2 className="h-3.5 w-3.5" />
                           )}
+                          <span>Delete</span>
                         </button>
                       </div>
-                    </td>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* 2. Desktop Table View (>= sm screens) */}
+            <div className="hidden sm:block overflow-x-auto">
+              <table className="w-full text-left text-xs">
+                <thead className="border-b border-slate-200 bg-slate-50/70 font-bold uppercase tracking-wider text-slate-500 text-[10px]">
+                  <tr>
+                    <th className="px-4 py-3.5">Station & Operator</th>
+                    {isSiteAdmin && <th className="px-4 py-3.5">Owner / Host</th>}
+                    <th className="px-4 py-3.5">Coordinates & City</th>
+                    <th className="px-4 py-3.5">Plugs & Speeds</th>
+                    <th className="px-4 py-3.5">Pricing</th>
+                    <th className="px-4 py-3.5">Status</th>
+                    <th className="px-4 py-3.5 text-right">Actions</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
+                  {filtered.map((station) => (
+                    <tr key={station.id} className="hover:bg-slate-50/80 transition-colors">
+                      <td className="px-4 py-3.5">
+                        <div className="font-bold text-slate-900 text-sm">{station.name}</div>
+                        <div className="text-[11px] text-slate-400">{station.operator_name}</div>
+                        <div className="text-[11px] text-slate-500 truncate max-w-xs">{station.address}</div>
+                      </td>
+
+                      {isSiteAdmin && (
+                        <td className="px-4 py-3.5 whitespace-nowrap">
+                          <span className="inline-flex items-center gap-1 rounded-md bg-slate-100 px-2 py-0.5 text-[11px] font-mono text-slate-700">
+                            <User className="h-3 w-3 text-slate-400" />
+                            {station.user_email || 'admin@evchargers.rw'}
+                          </span>
+                        </td>
+                      )}
+
+                      <td className="px-4 py-3.5 font-mono text-[11px] text-slate-500 whitespace-nowrap">
+                        <div>
+                          {station.latitude.toFixed(4)}, {station.longitude.toFixed(4)}
+                        </div>
+                        <span className="font-sans text-[10px] text-slate-400 font-medium">
+                          {station.city || 'Kigali'}
+                        </span>
+                      </td>
+
+                      <td className="px-4 py-3.5">
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-1.5 font-bold text-slate-800 text-[11px]">
+                            <Zap className="h-3 w-3 text-brand-600" />
+                            <span>
+                              {station.connectors?.reduce((acc, c) => acc + (c.power_kw * (c.quantity || 1)), 0) || 0} kW Hub Total
+                            </span>
+                            <span className="text-[10px] text-slate-400 font-normal">
+                              ({station.connectors?.reduce((acc, c) => acc + (c.quantity || 1), 0) || 0} bays)
+                            </span>
+                          </div>
+                          <div className="flex flex-wrap gap-1">
+                            {station.connectors?.map((c, i) => (
+                              <span
+                                key={i}
+                                className="inline-flex items-center gap-1 rounded-md bg-slate-100 px-1.5 py-0.5 text-[10px] font-semibold text-slate-700"
+                              >
+                                {c.quantity}x {c.power_kw} kW {c.connector_type === 'GB_T' ? 'GB/T' : c.connector_type.replace('_', ' ')}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      </td>
+
+                      <td className="px-4 py-3.5 whitespace-nowrap">
+                        {station.is_free ? (
+                          <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-700">
+                            <Sparkles className="h-2.5 w-2.5" />
+                            Free
+                          </span>
+                        ) : (
+                          <span className="text-slate-700 text-xs font-semibold">
+                            {station.pricing_info}
+                          </span>
+                        )}
+                      </td>
+
+                      <td className="px-4 py-3.5 whitespace-nowrap">
+                        <select
+                          value={station.status}
+                          onChange={(e) =>
+                            handleStatusChange(station.id, e.target.value as StationStatus)
+                          }
+                          className={`rounded-lg border px-2 py-1 text-[11px] font-bold cursor-pointer focus:outline-none ${
+                            station.status === 'ACTIVE'
+                              ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
+                              : station.status === 'MAINTENANCE'
+                              ? 'border-amber-200 bg-amber-50 text-amber-700'
+                              : 'border-rose-200 bg-rose-50 text-rose-700'
+                          }`}
+                        >
+                          <option value="ACTIVE">Active</option>
+                          <option value="MAINTENANCE">Maintenance</option>
+                          <option value="OFFLINE">Offline</option>
+                        </select>
+                      </td>
+
+                      <td className="px-4 py-3.5 text-right whitespace-nowrap">
+                        <div className="flex items-center justify-end gap-1">
+                          <button
+                            onClick={() => onEditStation(station)}
+                            title="Edit Station"
+                            className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition-colors"
+                          >
+                            <Edit2 className="h-4 w-4" />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(station.id, station.name)}
+                            disabled={deletingId === station.id}
+                            title="Delete Station"
+                            className="rounded-lg p-1.5 text-slate-400 hover:bg-rose-50 hover:text-rose-600 transition-colors disabled:opacity-50"
+                          >
+                            {deletingId === station.id ? (
+                              <Loader2 className="h-4 w-4 animate-spin text-rose-600" />
+                            ) : (
+                              <Trash2 className="h-4 w-4" />
+                            )}
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
       </div>
     </div>

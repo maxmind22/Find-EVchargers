@@ -56,6 +56,8 @@ export function EVMap({
         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>',
       subdomains: 'abcd',
       maxZoom: 19,
+      keepBuffer: 6,
+      updateWhenIdle: true,
     }).addTo(map);
 
     L.control.attribution({ position: 'bottomright', prefix: false }).addTo(map);
@@ -98,16 +100,21 @@ export function EVMap({
       }
     });
 
-    // Add or update markers
+    // Add or update markers with DOM update memoization
     stations.forEach((station) => {
       const isSelected = selectedStation?.id === station.id;
-      const icon = createStationIcon(station, isSelected);
       const existingMarker = markersRef.current[station.id];
 
       if (existingMarker) {
-        existingMarker.setIcon(icon);
+        // Only re-create icon if selection state changed to eliminate DOM thrashing
+        if ((existingMarker as any)._isSelected !== isSelected) {
+          const icon = createStationIcon(station, isSelected);
+          existingMarker.setIcon(icon);
+          (existingMarker as any)._isSelected = isSelected;
+        }
         existingMarker.setLatLng([station.latitude, station.longitude]);
       } else {
+        const icon = createStationIcon(station, isSelected);
         const marker = L.marker([station.latitude, station.longitude], { icon })
           .addTo(map)
           .on('click', (e) => {
@@ -118,6 +125,7 @@ export function EVMap({
             });
           });
 
+        (marker as any)._isSelected = isSelected;
         markersRef.current[station.id] = marker;
       }
     });
@@ -193,12 +201,13 @@ export function EVMap({
       <div ref={mapContainerRef} className="h-full w-full" />
 
       {/* Floating Map Controls (Stacked cleanly above the bottom-right AI Chatbot) */}
-      <div className="absolute right-4 sm:right-6 bottom-24 sm:bottom-24 z-20 flex flex-col gap-2">
+      <div className="absolute right-3 sm:right-6 bottom-20 sm:bottom-24 z-20 flex flex-col gap-2">
         <button
           onClick={handleLocateMe}
           disabled={isLocating}
           title="Locate my position"
-          className="flex h-11 w-11 items-center justify-center rounded-xl bg-white text-slate-700 shadow-md transition-all hover:bg-slate-50 hover:text-brand-600 active:scale-95 disabled:opacity-50 border border-slate-200/80"
+          aria-label="Locate my position on map"
+          className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/98 text-slate-700 shadow-lg backdrop-blur-md transition-all hover:bg-slate-50 hover:text-brand-600 active:scale-95 disabled:opacity-50 border border-slate-200/90"
         >
           {isLocating ? (
             <Loader2 className="h-5 w-5 animate-spin text-brand-600" />
@@ -207,18 +216,20 @@ export function EVMap({
           )}
         </button>
 
-        <div className="flex flex-col overflow-hidden rounded-xl bg-white shadow-md border border-slate-200/80">
+        <div className="flex flex-col overflow-hidden rounded-2xl bg-white/98 shadow-lg backdrop-blur-md border border-slate-200/90">
           <button
             onClick={handleZoomIn}
             title="Zoom In"
-            className="flex h-10 w-11 items-center justify-center text-slate-700 hover:bg-slate-50 hover:text-brand-600 active:bg-slate-100 border-b border-slate-100"
+            aria-label="Zoom in"
+            className="flex h-11 w-11 items-center justify-center text-slate-700 hover:bg-slate-50 hover:text-brand-600 active:bg-slate-100 border-b border-slate-100"
           >
             <Plus className="h-4 w-4 stroke-[2.5]" />
           </button>
           <button
             onClick={handleZoomOut}
             title="Zoom Out"
-            className="flex h-10 w-11 items-center justify-center text-slate-700 hover:bg-slate-50 hover:text-brand-600 active:bg-slate-100"
+            aria-label="Zoom out"
+            className="flex h-11 w-11 items-center justify-center text-slate-700 hover:bg-slate-50 hover:text-brand-600 active:bg-slate-100"
           >
             <Minus className="h-4 w-4 stroke-[2.5]" />
           </button>

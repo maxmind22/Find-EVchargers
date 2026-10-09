@@ -57,11 +57,18 @@ export async function GET(request: NextRequest) {
 
     const stations = await getStations({ bounds, filters });
 
-    return NextResponse.json({
-      success: true,
-      count: stations.length,
-      data: stations,
-    });
+    return NextResponse.json(
+      {
+        success: true,
+        count: stations.length,
+        data: stations,
+      },
+      {
+        headers: {
+          'Cache-Control': 'public, max-age=30, s-maxage=60, stale-while-revalidate=300',
+        },
+      }
+    );
   } catch (error: any) {
     return NextResponse.json(
       { success: false, error: error?.message || 'Failed to fetch stations' },

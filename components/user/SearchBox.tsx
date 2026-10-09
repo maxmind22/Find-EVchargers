@@ -19,6 +19,9 @@ interface GeocodeResult {
   country?: string;
 }
 
+// Module-level client-side in-memory cache for instant geocoding autocompletion
+const clientGeocodeCache = new Map<string, GeocodeResult[]>();
+
 export function SearchBox({
   stations = [],
   onSelectStation,
@@ -69,31 +72,50 @@ export function SearchBox({
     setStationResults(matched.slice(0, 5));
   }, [query, stations]);
 
-  // Debounced geocoding search for street/landmark places
+  // Debounced geocoding search for street/landmark places with instant memory caching
   useEffect(() => {
-    if (!query.trim() || query.length < 2) {
+    const trimmed = query.trim();
+    if (!trimmed || trimmed.length < 2) {
       setGeoResults([]);
       setIsLoading(false);
       return;
     }
 
+    // Check instant client-side memory cache
+    if (clientGeocodeCache.has(trimmed.toLowerCase())) {
+      setGeoResults(clientGeocodeCache.get(trimmed.toLowerCase())!);
+      setIsOpen(true);
+      setIsLoading(false);
+      return;
+    }
+
+    const abortController = new AbortController();
+
     const timer = setTimeout(async () => {
       setIsLoading(true);
       try {
-        const res = await fetch(`/api/geocode?q=${encodeURIComponent(query)}`);
+        const res = await fetch(`/api/geocode?q=${encodeURIComponent(trimmed)}`, {
+          signal: abortController.signal,
+        });
         const json = await res.json();
         if (json.success && Array.isArray(json.data)) {
+          clientGeocodeCache.set(trimmed.toLowerCase(), json.data);
           setGeoResults(json.data);
           setIsOpen(true);
         }
-      } catch (e) {
-        console.warn('Search geocode error:', e);
+      } catch (e: any) {
+        if (e?.name !== 'AbortError') {
+          console.warn('Search geocode error:', e);
+        }
       } finally {
         setIsLoading(false);
       }
-    }, 300);
+    }, 250);
 
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+      abortController.abort();
+    };
   }, [query]);
 
   // Handle station click
@@ -178,14 +200,15 @@ export function SearchBox({
           }}
           onFocus={() => setIsOpen(true)}
           placeholder={placeholder}
-          className="w-full rounded-2xl border border-slate-200/90 bg-white/95 py-2.5 pl-10 pr-10 text-sm font-medium text-slate-900 shadow-md backdrop-blur-md transition-all placeholder:text-slate-400 focus:border-brand-500 focus:outline-none focus:ring-4 focus:ring-brand-500/10"
+          className="w-full rounded-2xl border border-slate-200/90 bg-white/95 py-2.5 pl-10 pr-11 text-base sm:text-sm font-medium text-slate-900 shadow-md backdrop-blur-md transition-all placeholder:text-slate-400 focus:border-brand-500 focus:outline-none focus:ring-4 focus:ring-brand-500/10"
         />
 
         {query && (
           <button
             type="button"
             onClick={handleClear}
-            className="absolute right-3 rounded-full p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+            className="absolute right-2.5 top-1/2 -translate-y-1/2 flex h-8 w-8 items-center justify-center rounded-full text-slate-400 hover:bg-slate-100 hover:text-slate-600 active:scale-95 transition-transform"
+            aria-label="Clear search"
           >
             <X className="h-4 w-4" />
           </button>
@@ -194,7 +217,7 @@ export function SearchBox({
 
       {/* Autocomplete Dropdown */}
       {isOpen && query.trim().length > 0 && (
-        <div className="absolute top-full left-0 right-0 z-50 mt-2 max-h-80 overflow-y-auto rounded-2xl border border-slate-200 bg-white p-2 shadow-2xl animate-in fade-in-50 zoom-in-95 duration-150 divide-y divide-slate-100">
+        <div className="absolute top-full left-0 right-0 z-50 mt-2 max-h-[60vh] sm:max-h-80 overflow-y-auto rounded-2xl border border-slate-200 bg-white/98 p-2 shadow-2xl backdrop-blur-md animate-in fade-in-50 zoom-in-95 duration-150 divide-y divide-slate-100">
           {/* 1. EV Charging Station Matches */}
           {stationResults.length > 0 && (
             <div className="pb-1.5">
@@ -213,7 +236,7 @@ export function SearchBox({
                       key={station.id}
                       type="button"
                       onClick={() => handleSelectStation(station)}
-                      className="flex w-full items-center justify-between rounded-xl p-2 text-left text-xs transition-colors hover:bg-brand-50/70 focus:bg-brand-50 group"
+                      className="flex min-h-[46px] w-full items-center justify-between rounded-xl p-2.5 text-left text-xs transition-colors hover:bg-brand-50/70 focus:bg-brand-50 active:bg-brand-100/50 group"
                     >
                       <div className="min-w-0 flex-1 pr-2">
                         <p className="truncate font-bold text-slate-900 group-hover:text-brand-700">
@@ -251,7 +274,7 @@ export function SearchBox({
                     key={idx}
                     type="button"
                     onClick={() => handleSelectGeo(item)}
-                    className="flex w-full items-start gap-2.5 rounded-xl p-2 text-left text-xs transition-colors hover:bg-slate-50 focus:bg-slate-50"
+                    className="flex min-h-[44px] w-full items-start gap-2.5 rounded-xl p-2.5 text-left text-xs transition-colors hover:bg-slate-50 focus:bg-slate-50 active:bg-slate-100/70"
                   >
                     <MapPin className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-slate-400" />
                     <div className="min-w-0 flex-1">

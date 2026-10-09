@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Zap,
   MapPin,
@@ -38,12 +38,23 @@ export function NavigationHeader() {
     }
   };
 
+  // Close mobile menu on Escape key
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setMobileMenuOpen(false);
+    };
+    if (mobileMenuOpen) {
+      document.addEventListener('keydown', handleKeyDown);
+    }
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [mobileMenuOpen]);
+
   return (
     <header className="sticky top-0 z-30 flex flex-col border-b border-slate-200 bg-white/95 backdrop-blur-md shadow-sm">
-      <div className="flex items-center justify-between px-4 py-2.5 sm:px-6">
+      <div className="flex items-center justify-between px-3.5 py-2 sm:px-6">
         {/* Brand Logo */}
         <div className="flex items-center gap-3">
-          <Link href="/" className="group" onClick={() => setMobileMenuOpen(false)}>
+          <Link href="/" className="group flex items-center" onClick={() => setMobileMenuOpen(false)}>
             <Logo size="md" />
           </Link>
         </div>
@@ -137,11 +148,11 @@ export function NavigationHeader() {
         </nav>
 
         {/* Mobile Action Controls */}
-        <div className="flex items-center gap-2 md:hidden">
+        <div className="flex items-center gap-1.5 md:hidden">
           <button
             type="button"
             onClick={handleOpenAIChat}
-            className="flex items-center gap-1 rounded-xl bg-brand-50 border border-brand-200 px-2.5 py-1.5 text-xs font-bold text-brand-700"
+            className="flex h-10 items-center gap-1.5 rounded-xl bg-brand-50 border border-brand-200/90 px-3 text-xs font-bold text-brand-700 shadow-2xs active:scale-95 transition-transform"
             aria-label="Open AI Assistant"
           >
             <Bot className="h-4 w-4 text-brand-600" />
@@ -153,99 +164,107 @@ export function NavigationHeader() {
           <button
             type="button"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 focus:outline-none"
+            className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 active:scale-95 transition-all focus:outline-none"
             aria-label="Toggle navigation menu"
+            aria-expanded={mobileMenuOpen}
           >
             {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
         </div>
       </div>
 
-      {/* Mobile Drawer Menu */}
+      {/* Mobile Drawer Menu & Scrim Backdrop */}
       {mobileMenuOpen && (
-        <div className="border-t border-slate-200/80 bg-white px-4 py-3 md:hidden space-y-1 animate-in slide-in-from-top-2 duration-150">
-          <Link
-            href="/"
+        <>
+          <div
+            className="fixed inset-0 top-[57px] z-20 bg-slate-900/50 backdrop-blur-xs md:hidden animate-in fade-in duration-150"
             onClick={() => setMobileMenuOpen(false)}
-            className={`flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-xs font-semibold transition-colors ${
-              isMapPath ? 'bg-brand-50 text-brand-700' : 'text-slate-700 hover:bg-slate-50'
-            }`}
-          >
-            <MapPin className="h-4 w-4 text-brand-600" />
-            <span>Driver Map</span>
-          </Link>
-
-          <button
-            type="button"
-            onClick={handleOpenAIChat}
-            className="flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200/80 transition-colors text-left"
-          >
-            <div className="flex items-center gap-2.5">
-              <Bot className="h-4 w-4 text-emerald-600" />
-              <span>ChargeBot AI Assistant</span>
-            </div>
-            <span className="rounded-full bg-emerald-200 px-1.5 py-0.2 text-[9px] font-bold text-emerald-900">
-              NEW
-            </span>
-          </button>
-
-          <Link
-            href="/about"
-            onClick={() => setMobileMenuOpen(false)}
-            className={`flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-xs font-semibold transition-colors ${
-              isAboutPath ? 'bg-brand-50 text-brand-700' : 'text-slate-700 hover:bg-slate-50'
-            }`}
-          >
-            <Info className="h-4 w-4 text-slate-500" />
-            <span>About Us</span>
-          </Link>
-
-          <Link
-            href="/contact"
-            onClick={() => setMobileMenuOpen(false)}
-            className={`flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-xs font-semibold transition-colors ${
-              isContactPath ? 'bg-brand-50 text-brand-700' : 'text-slate-700 hover:bg-slate-50'
-            }`}
-          >
-            <Phone className="h-4 w-4 text-slate-500" />
-            <span>Contact Us &amp; Support</span>
-          </Link>
-
-          <Link
-            href="/privacy"
-            onClick={() => setMobileMenuOpen(false)}
-            className="flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
-          >
-            <Shield className="h-4 w-4 text-slate-500" />
-            <span>Privacy Policy</span>
-          </Link>
-
-          <Link
-            href="/usage-policy"
-            onClick={() => setMobileMenuOpen(false)}
-            className="flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
-          >
-            <FileText className="h-4 w-4 text-slate-500" />
-            <span>Usage Policy &amp; Terms</span>
-          </Link>
-
-          <div className="pt-2">
+            aria-hidden="true"
+          />
+          <div className="relative z-30 border-t border-slate-200 bg-white px-4 py-3 md:hidden space-y-1 shadow-xl animate-in slide-in-from-top-2 duration-150">
             <Link
-              href="/admin"
+              href="/"
               onClick={() => setMobileMenuOpen(false)}
-              className="flex w-full items-center justify-center gap-2 rounded-xl bg-slate-900 py-2.5 text-xs font-bold text-white shadow-md hover:bg-slate-800 transition-colors"
+              className={`flex items-center gap-3 rounded-2xl px-3.5 py-3 text-sm font-semibold transition-colors ${
+                isMapPath ? 'bg-brand-50 text-brand-700' : 'text-slate-800 hover:bg-slate-50'
+              }`}
             >
-              {user ? (
-                <span>{isSiteAdmin ? 'Go to Admin Hub' : 'My Charging Stations'}</span>
-              ) : (
-                <>
-                  <User className="h-4 w-4" />
-                  <span>Station Host Sign In / Sign Up</span>
-                </>
-              )}
+              <MapPin className="h-4 w-4 text-brand-600" />
+              <span>Driver Map</span>
             </Link>
+
+            <button
+              type="button"
+              onClick={handleOpenAIChat}
+              className="flex w-full items-center justify-between rounded-2xl px-3.5 py-3 text-sm font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200/80 transition-colors text-left"
+            >
+              <div className="flex items-center gap-3">
+                <Bot className="h-4 w-4 text-emerald-600" />
+                <span>ChargeBot AI Assistant</span>
+              </div>
+              <span className="rounded-full bg-emerald-200 px-2 py-0.5 text-[10px] font-bold text-emerald-900">
+                NEW
+              </span>
+            </button>
+
+            <Link
+              href="/about"
+              onClick={() => setMobileMenuOpen(false)}
+              className={`flex items-center gap-3 rounded-2xl px-3.5 py-3 text-sm font-semibold transition-colors ${
+                isAboutPath ? 'bg-brand-50 text-brand-700' : 'text-slate-800 hover:bg-slate-50'
+              }`}
+            >
+              <Info className="h-4 w-4 text-slate-500" />
+              <span>About Us</span>
+            </Link>
+
+            <Link
+              href="/contact"
+              onClick={() => setMobileMenuOpen(false)}
+              className={`flex items-center gap-3 rounded-2xl px-3.5 py-3 text-sm font-semibold transition-colors ${
+                isContactPath ? 'bg-brand-50 text-brand-700' : 'text-slate-800 hover:bg-slate-50'
+              }`}
+            >
+              <Phone className="h-4 w-4 text-slate-500" />
+              <span>Contact Us &amp; Support</span>
+            </Link>
+
+            <Link
+              href="/privacy"
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center gap-3 rounded-2xl px-3.5 py-3 text-sm font-semibold text-slate-800 hover:bg-slate-50 transition-colors"
+            >
+              <Shield className="h-4 w-4 text-slate-500" />
+              <span>Privacy Policy</span>
+            </Link>
+
+            <Link
+              href="/usage-policy"
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center gap-3 rounded-2xl px-3.5 py-3 text-sm font-semibold text-slate-800 hover:bg-slate-50 transition-colors"
+            >
+              <FileText className="h-4 w-4 text-slate-500" />
+              <span>Usage Policy &amp; Terms</span>
+            </Link>
+
+            <div className="pt-2">
+              <Link
+                href="/admin"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex w-full items-center justify-center gap-2 rounded-2xl bg-slate-900 py-3 text-xs font-bold text-white shadow-md hover:bg-slate-800 active:scale-98 transition-all"
+              >
+                {user ? (
+                  <span>{isSiteAdmin ? 'Go to Admin Hub' : 'My Charging Stations'}</span>
+                ) : (
+                  <>
+                    <User className="h-4 w-4" />
+                    <span>Station Host Sign In / Sign Up</span>
+                  </>
+                )}
+              </Link>
+            </div>
           </div>
-        </div>
+        </>
       )}
     </header>
   );

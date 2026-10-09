@@ -1,8 +1,8 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { NavigationHeader } from '@/components/NavigationHeader';
 import { AuthProvider } from '@/lib/authContext';
-import { AIChatbot } from '@/components/chatbot/AIChatbot';
+import { ChatbotClientWrapper } from '@/components/chatbot/ChatbotClientWrapper';
 
 export const metadata: Metadata = {
   title: 'EVchargers | Interactive EV Charging Map & Network (Kigali)',
@@ -15,6 +15,14 @@ export const metadata: Metadata = {
   },
 };
 
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
+  themeColor: '#0f172a',
+};
+
 export default function RootLayout({
   children,
 }: {
@@ -22,14 +30,21 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="flex h-screen flex-col bg-slate-900 antialiased selection:bg-brand-500 selection:text-white">
+      <head>
+        {/* Preconnect to CARTO tile CDN for ultra-fast initial Leaflet tile rendering */}
+        <link rel="preconnect" href="https://basemaps.cartocdn.com" />
+        <link rel="preconnect" href="https://a.basemaps.cartocdn.com" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://b.basemaps.cartocdn.com" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://c.basemaps.cartocdn.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://basemaps.cartocdn.com" />
+      </head>
+      <body className="flex h-[100dvh] flex-col bg-slate-900 antialiased selection:bg-brand-500 selection:text-white pb-safe">
         <AuthProvider>
           <NavigationHeader />
           <main className="relative flex-1 overflow-hidden">{children}</main>
-          <AIChatbot />
+          <ChatbotClientWrapper />
         </AuthProvider>
       </body>
     </html>
   );
 }
-

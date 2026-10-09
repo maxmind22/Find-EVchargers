@@ -113,7 +113,7 @@ export function ReportModal({ station, isOpen, onClose }: ReportModalProps) {
                   value={comment}
                   onChange={(e) => setComment(e.target.value)}
                   placeholder="e.g., Plug #2 screen displays error code 404..."
-                  className="w-full rounded-xl border border-slate-200 p-3 text-xs text-slate-900 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                  className="w-full rounded-xl border border-slate-200 p-3 text-base sm:text-xs text-slate-900 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
                 />
               </div>
 
@@ -121,14 +121,14 @@ export function ReportModal({ station, isOpen, onClose }: ReportModalProps) {
                 <button
                   type="button"
                   onClick={onClose}
-                  className="flex-1 rounded-xl border border-slate-200 py-2.5 font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
+                  className="flex-1 min-h-[44px] rounded-xl border border-slate-200 py-2.5 font-semibold text-slate-700 hover:bg-slate-50 active:scale-98 transition-all"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="flex-1 flex items-center justify-center gap-1.5 rounded-xl bg-brand-600 py-2.5 font-semibold text-white hover:bg-brand-700 transition-colors shadow-md shadow-brand-500/20 disabled:opacity-50"
+                  className="flex-1 min-h-[44px] flex items-center justify-center gap-1.5 rounded-xl bg-brand-600 py-2.5 font-semibold text-white hover:bg-brand-700 active:scale-98 transition-all shadow-md shadow-brand-500/20 disabled:opacity-50"
                 >
                   {isSubmitting ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
