@@ -67,7 +67,7 @@ export default function PrivacyPolicyPage() {
         {/* Section 2: Information We Collect */}
         <section className="space-y-4 bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-sm">
           <h2 className="text-lg font-bold text-slate-900">2. Information We Collect</h2>
-          
+
           <div className="space-y-4 text-xs sm:text-sm text-slate-600">
             <div>
               <h3 className="font-bold text-slate-800 flex items-center gap-2">
@@ -160,7 +160,7 @@ export default function PrivacyPolicyPage() {
           </p>
           <div className="rounded-2xl bg-slate-50 p-4 border border-slate-200/80 text-xs sm:text-sm text-slate-700 space-y-1">
             <p className="font-bold text-slate-900">EVchargers Data Protection Officer</p>
-            <p>Email: <a href="mailto:privacy@evchargers.rw" className="text-brand-600 font-semibold hover:underline">privacy@evchargers.rw</a></p>
+            <p>Email: <a href="mailto:contact@mpeka.rw" className="text-brand-600 font-semibold hover:underline">contact@mpeka.rw</a></p>
             <p>Address: Kigali Innovation District, Gasabo, Kigali, Rwanda</p>
           </div>
         </section>

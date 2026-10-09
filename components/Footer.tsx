@@ -116,7 +116,7 @@ export function Footer() {
 
         {/* Bottom divider & copyright */}
         <div className="mt-10 border-t border-slate-200/80 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
-          <p>© {new Date().getFullYear()} EVchargers Kigali. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} Mpeka. All rights reserved.</p>
           <div className="flex items-center gap-4">
             <Link href="/privacy" className="hover:text-slate-600 transition-colors">
               Privacy
