@@ -154,7 +154,7 @@ export default function ContactPage() {
                   >
                     contact@mpeka.rw
                   </a>
-                  <span className="text-[10px] text-slate-400">Labeled (EVchargers) • &lt; 2h response</span>
+                  <span className="text-[10px] text-slate-400">Average response time: &lt; 2 hours</span>
                 </div>
               </div>
 
@@ -201,9 +201,8 @@ export default function ContactPage() {
                   <div className="space-y-1.5">
                     <h3 className="text-base font-bold text-brand-950">Message Sent Successfully!</h3>
                     <p className="text-xs text-brand-800 max-w-md mx-auto">
-                      Your inquiry has been routed to{' '}
-                      <span className="font-bold text-brand-950">{submittedRecipient}</span> labeled with{' '}
-                      <span className="font-bold text-brand-950">[EVchargers]</span> under ticket reference:
+                      Your inquiry has been sent to{' '}
+                      <span className="font-bold text-brand-950">{submittedRecipient}</span> under reference ticket:
                     </p>
                     <div className="inline-block rounded-lg bg-white px-3 py-1 font-mono text-xs font-bold text-brand-700 shadow-sm border border-brand-200">
                       {submissionSuccess}
