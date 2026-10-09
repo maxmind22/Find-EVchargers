@@ -59,6 +59,7 @@ export default function ContactPage() {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionSuccess, setSubmissionSuccess] = useState<string | null>(null);
+  const [submittedRecipient, setSubmittedRecipient] = useState<string>('contact@mpeka.rw');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
 
@@ -79,6 +80,9 @@ export default function ContactPage() {
 
       if (res.ok && data.success) {
         setSubmissionSuccess(data.ticketId || 'EV-SUBMITTED');
+        if (data.recipient) {
+          setSubmittedRecipient(data.recipient);
+        }
         setFormData({
           name: '',
           email: '',
@@ -144,14 +148,14 @@ export default function ContactPage() {
                   <Mail className="h-4 w-4" />
                 </div>
                 <div>
-                  <h4 className="text-xs font-bold text-slate-900">Email Inquiries</h4>
+                  <h4 className="text-xs font-bold text-slate-900">Email Support Desk</h4>
                   <a
-                    href="mailto:support@evchargers.rw"
+                    href="mailto:contact@mpeka.rw?subject=%5BEVchargers%5D%20Support%20Inquiry"
                     className="text-xs font-medium text-brand-600 hover:underline block"
                   >
-                    support@mpeka.rw
+                    contact@mpeka.rw
                   </a>
-                  <span className="text-[10px] text-slate-400">Average response time: &lt; 2 hours</span>
+                  <span className="text-[10px] text-slate-400">Labeled (EVchargers) • &lt; 2h response</span>
                 </div>
               </div>
 
@@ -206,22 +210,33 @@ export default function ContactPage() {
                   <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-brand-500 text-white shadow-md">
                     <CheckCircle2 className="h-6 w-6" />
                   </div>
-                  <div className="space-y-1">
+                  <div className="space-y-1.5">
                     <h3 className="text-base font-bold text-brand-950">Message Sent Successfully!</h3>
-                    <p className="text-xs text-brand-800">
-                      Thank you for reaching out. We have logged your request under reference ticket:
+                    <p className="text-xs text-brand-800 max-w-md mx-auto">
+                      Your inquiry has been routed to{' '}
+                      <span className="font-bold text-brand-950">{submittedRecipient}</span> labeled with{' '}
+                      <span className="font-bold text-brand-950">[EVchargers]</span> under ticket reference:
                     </p>
                     <div className="inline-block rounded-lg bg-white px-3 py-1 font-mono text-xs font-bold text-brand-700 shadow-sm border border-brand-200">
                       {submissionSuccess}
                     </div>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => setSubmissionSuccess(null)}
-                    className="inline-flex items-center gap-1.5 rounded-xl bg-brand-600 px-4 py-2 text-xs font-bold text-white hover:bg-brand-700 transition-colors"
-                  >
-                    Send Another Message
-                  </button>
+                  <div className="flex flex-col sm:flex-row items-center justify-center gap-2 pt-2">
+                    <button
+                      type="button"
+                      onClick={() => setSubmissionSuccess(null)}
+                      className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 rounded-xl bg-brand-600 px-4 py-2.5 text-xs font-bold text-white hover:bg-brand-700 transition-colors"
+                    >
+                      Send Another Message
+                    </button>
+                    <a
+                      href={`mailto:${submittedRecipient}?subject=%5BEVchargers%5D%20Reference%3A%20${submissionSuccess}`}
+                      className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 rounded-xl bg-white border border-brand-200 px-4 py-2.5 text-xs font-semibold text-brand-900 hover:bg-brand-100/50 transition-colors"
+                    >
+                      <Mail className="h-3.5 w-3.5 text-brand-600" />
+                      <span>Open in Mail Client</span>
+                    </a>
+                  </div>
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="mt-6 space-y-4">

@@ -67,6 +67,12 @@ SUPABASE_SERVICE_ROLE_KEY=""
 # Get a 100% free key (up to 5M loads/month) at https://carto.com/basemaps/apikey
 # ====================================================================
 NEXT_PUBLIC_CARTO_API_KEY=""
+
+# ====================================================================
+# CONTACT FORM & SUPPORT INBOX (Sends to contact@mpeka.rw with [EVchargers] tag)
+# ====================================================================
+CONTACT_RECIPIENT_EMAIL="contact@mpeka.rw"
+RESEND_API_KEY=""  # Free 3,000 emails/mo from https://resend.com/
 ```
 
 ---
