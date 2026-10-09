@@ -202,7 +202,12 @@ ${cleanMessage}
         } else {
           const resendErr = await resendRes.text();
           console.warn('[EVchargers] Resend API error response:', resendErr);
-          deliveryError = 'Resend delivery failed';
+          try {
+            const parsed = JSON.parse(resendErr);
+            deliveryError = parsed.message || resendErr;
+          } catch {
+            deliveryError = resendErr;
+          }
         }
       } catch (err) {
         console.warn('[EVchargers] Resend delivery network error:', err);
@@ -237,7 +242,12 @@ ${cleanMessage}
         } else {
           const brevoErr = await brevoRes.text();
           console.warn('[EVchargers] Brevo API error response:', brevoErr);
-          deliveryError = 'Brevo delivery failed';
+          try {
+            const parsed = JSON.parse(brevoErr);
+            deliveryError = parsed.message || brevoErr;
+          } catch {
+            deliveryError = brevoErr;
+          }
         }
       } catch (err) {
         console.warn('[EVchargers] Brevo delivery network error:', err);
@@ -284,10 +294,30 @@ ${cleanMessage}
       } | Recipient: ${recipientEmail} | Subject: "${emailSubject}" | Ticket: ${ticketId}`
     );
 
+    // If an email provider was attempted or configured but failed, return an informative error
+    if (deliveryStatus !== 'sent') {
+      const isConfigured = Boolean(
+        process.env.RESEND_API_KEY || process.env.BREVO_API_KEY || process.env.CONTACT_WEBHOOK_URL
+      );
+      const errorMessage = isConfigured
+        ? `Email delivery failed: ${deliveryError || 'Unable to deliver message'}`
+        : 'Email service is not yet configured with a valid RESEND_API_KEY.';
+
+      return NextResponse.json(
+        {
+          success: false,
+          error: errorMessage,
+          ticketId,
+          recipient: recipientEmail,
+        },
+        { status: 502 }
+      );
+    }
+
     return NextResponse.json({
       success: true,
       ticketId,
-      delivered: deliveryStatus === 'sent',
+      delivered: true,
       provider: deliveryProvider,
       recipient: recipientEmail,
       label: 'EVchargers',
@@ -301,7 +331,6 @@ ${cleanMessage}
         recipientEmail,
         submittedAt: new Date().toISOString(),
       },
-      warning: deliveryError,
     });
   } catch (error) {
     console.error('[EVchargers Contact Form Error]:', error);
