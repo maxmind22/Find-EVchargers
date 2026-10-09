@@ -149,7 +149,7 @@ export default function ContactPage() {
                     href="mailto:support@evchargers.rw"
                     className="text-xs font-medium text-brand-600 hover:underline block"
                   >
-                    support@evchargers.rw
+                    support@mpeka.rw
                   </a>
                   <span className="text-[10px] text-slate-400">Average response time: &lt; 2 hours</span>
                 </div>
@@ -162,7 +162,7 @@ export default function ContactPage() {
                 </div>
                 <div>
                   <h4 className="text-xs font-bold text-slate-900">Driver Hotline &amp; WhatsApp</h4>
-                  <p className="text-xs font-semibold text-slate-800">+250 788 123 456</p>
+                  <p className="text-xs font-semibold text-slate-800">+250 788 688 334</p>
                   <span className="text-[10px] text-slate-400">Available 24/7 for charging emergencies</span>
                 </div>
               </div>
@@ -364,9 +364,8 @@ export default function ContactPage() {
                   >
                     <span>{faq.question}</span>
                     <ChevronDown
-                      className={`h-4 w-4 text-slate-400 transition-transform duration-200 ${
-                        isOpen ? 'rotate-180 text-brand-600' : ''
-                      }`}
+                      className={`h-4 w-4 text-slate-400 transition-transform duration-200 ${isOpen ? 'rotate-180 text-brand-600' : ''
+                        }`}
                     />
                   </button>
                   {isOpen && (
