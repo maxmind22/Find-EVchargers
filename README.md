@@ -69,10 +69,11 @@ SUPABASE_SERVICE_ROLE_KEY=""
 NEXT_PUBLIC_CARTO_API_KEY=""
 
 # ====================================================================
-# CONTACT FORM & SUPPORT INBOX (Sends to contact@mpeka.rw with [EVchargers] tag)
+# CONTACT FORM & SUPPORT EMAIL CONFIGURATION (OPTIONAL)
 # ====================================================================
-CONTACT_RECIPIENT_EMAIL="contact@mpeka.rw"
-RESEND_API_KEY=""  # Free 3,000 emails/mo from https://resend.com/
+CONTACT_RECIPIENT_EMAIL=""
+CONTACT_FROM_EMAIL=""
+RESEND_API_KEY=""
 ```
 
 ---
