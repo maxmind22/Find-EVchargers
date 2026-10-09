@@ -4,7 +4,6 @@ import { useState } from 'react';
 import Link from 'next/link';
 import {
   Mail,
-  Phone,
   MapPin,
   Clock,
   Send,
@@ -159,17 +158,6 @@ export default function ContactPage() {
                 </div>
               </div>
 
-              {/* Phone & WhatsApp */}
-              <div className="flex items-start gap-3 rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm">
-                <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-electric-50 text-electric-600">
-                  <Phone className="h-4 w-4" />
-                </div>
-                <div>
-                  <h4 className="text-xs font-bold text-slate-900">Driver Hotline &amp; WhatsApp</h4>
-                  <p className="text-xs font-semibold text-slate-800">+250 788 688 334</p>
-                  <span className="text-[10px] text-slate-400">Available 24/7 for charging emergencies</span>
-                </div>
-              </div>
 
               {/* Location */}
               <div className="flex items-start gap-3 rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm">
