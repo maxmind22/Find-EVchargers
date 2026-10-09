@@ -12,11 +12,9 @@ import {
   AlertCircle,
   Eye,
   EyeOff,
-  Zap,
   CheckCircle2,
-  Building,
-  Key,
 } from 'lucide-react';
+import { Logo } from '@/components/Logo';
 
 export function AdminAuthCard() {
   const { signIn, signUp } = useAuth();
@@ -31,20 +29,6 @@ export function AdminAuthCard() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const handleFillSiteAdmin = () => {
-    setEmail('admin@evchargers.rw');
-    setPassword('Admin123!');
-    setErrorMsg(null);
-    setMode('signin');
-  };
-
-  const handleFillHost = () => {
-    setEmail('operator@kigalihub.rw');
-    setPassword('Host123!');
-    setErrorMsg(null);
-    setMode('signin');
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -96,9 +80,7 @@ export function AdminAuthCard() {
         {/* Top Header Banner */}
         <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-6 sm:p-8 text-white relative">
           <div className="flex items-center justify-between">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-tr from-brand-500 to-emerald-400 text-white shadow-lg shadow-brand-500/30">
-              <Zap className="h-6 w-6 fill-current" />
-            </div>
+            <Logo size="lg" showWordmark={false} />
             <span className="flex items-center gap-1 rounded-full bg-white/10 px-3 py-1 text-[11px] font-semibold text-emerald-400 backdrop-blur-md border border-white/10">
               <ShieldCheck className="h-3.5 w-3.5" />
               <span>Charger Management</span>
@@ -263,44 +245,6 @@ export function AdminAuthCard() {
               </>
             )}
           </button>
-
-          {/* Role Comparison & Quick Demo Fill */}
-          <div className="mt-4 rounded-2xl bg-slate-50 p-3.5 border border-slate-100 space-y-2.5 text-left">
-            <div className="text-[11px] font-bold text-slate-800 flex items-center gap-1">
-              <Key className="h-3 w-3 text-brand-600" />
-              Quick Demo Logins (1-Click):
-            </div>
-
-            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-              {/* Site Admin Button */}
-              <button
-                type="button"
-                onClick={handleFillSiteAdmin}
-                className="flex flex-col items-start rounded-xl border border-amber-200 bg-amber-50/70 p-2 text-left hover:bg-amber-100 transition-colors"
-              >
-                <div className="flex items-center gap-1 font-bold text-[11px] text-amber-900">
-                  <ShieldCheck className="h-3 w-3 text-amber-700" />
-                  <span>Site Admin (All)</span>
-                </div>
-                <span className="text-[10px] text-amber-700 font-mono mt-0.5">admin@evchargers.rw</span>
-                <span className="text-[9px] text-amber-600 mt-0.5">Unrestricted access to all chargers</span>
-              </button>
-
-              {/* Station Host Button */}
-              <button
-                type="button"
-                onClick={handleFillHost}
-                className="flex flex-col items-start rounded-xl border border-blue-200 bg-blue-50/70 p-2 text-left hover:bg-blue-100 transition-colors"
-              >
-                <div className="flex items-center gap-1 font-bold text-[11px] text-blue-900">
-                  <Building className="h-3 w-3 text-blue-700" />
-                  <span>Station Host</span>
-                </div>
-                <span className="text-[10px] text-blue-700 font-mono mt-0.5">operator@kigalihub.rw</span>
-                <span className="text-[9px] text-blue-600 mt-0.5">Only sees & manages their chargers</span>
-              </button>
-            </div>
-          </div>
         </form>
       </div>
     </div>

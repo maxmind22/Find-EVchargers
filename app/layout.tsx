@@ -8,6 +8,11 @@ export const metadata: Metadata = {
   title: 'EVchargers | Interactive EV Charging Map & Network (Kigali)',
   description:
     'Find available electric vehicle charging stations, ultra-fast DC & GB/T chargers, pricing, and connector specs in Kigali, Rwanda.',
+  icons: {
+    icon: '/icon.svg',
+    shortcut: '/favicon.svg',
+    apple: '/icon.svg',
+  },
 };
 
 export default function RootLayout({

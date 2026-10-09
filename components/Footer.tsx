@@ -1,5 +1,6 @@
 import Link from 'next/link';
-import { Zap, Shield, FileText, Phone, Mail, MapPin, ExternalLink, Heart } from 'lucide-react';
+import { Shield, FileText, Phone, Mail, MapPin, ExternalLink, Heart } from 'lucide-react';
+import { Logo } from '@/components/Logo';
 
 export function Footer() {
   return (
@@ -8,16 +9,8 @@ export function Footer() {
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-5">
           {/* Col 1 & 2: Brand & Mission */}
           <div className="lg:col-span-2 space-y-4">
-            <Link href="/" className="inline-flex items-center gap-2 group">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-tr from-brand-600 to-emerald-400 p-2 text-white shadow-md shadow-brand-500/20 group-hover:scale-105 transition-transform">
-                <Zap className="h-5 w-5 fill-current" />
-              </div>
-              <span className="text-xl font-bold tracking-tight text-slate-900 flex items-center gap-1.5">
-                EVchargers
-                <span className="rounded-md bg-brand-100 px-1.5 py-0.5 text-[10px] font-semibold text-brand-800 uppercase tracking-wider">
-                  Kigali
-                </span>
-              </span>
+            <Link href="/" className="inline-flex items-center group">
+              <Logo size="md" />
             </Link>
 
             <p className="text-sm text-slate-500 leading-relaxed max-w-sm">

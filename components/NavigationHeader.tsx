@@ -20,6 +20,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/lib/authContext';
 import { UserDropdown } from '@/components/user/UserDropdown';
+import { Logo } from '@/components/Logo';
 
 export function NavigationHeader() {
   const pathname = usePathname();
@@ -42,18 +43,8 @@ export function NavigationHeader() {
       <div className="flex items-center justify-between px-4 py-2.5 sm:px-6">
         {/* Brand Logo */}
         <div className="flex items-center gap-3">
-          <Link href="/" className="flex items-center gap-2 group" onClick={() => setMobileMenuOpen(false)}>
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-tr from-brand-600 to-emerald-400 p-2 text-white shadow-md shadow-brand-500/20 group-hover:scale-105 transition-transform">
-              <Zap className="h-5 w-5 fill-current" />
-            </div>
-            <div>
-              <span className="text-lg font-bold tracking-tight text-slate-900 flex items-center gap-1.5">
-                EVchargers
-                <span className="rounded-md bg-brand-100 px-1.5 py-0.5 text-[10px] font-semibold text-brand-800 uppercase tracking-wider">
-                  Kigali
-                </span>
-              </span>
-            </div>
+          <Link href="/" className="group" onClick={() => setMobileMenuOpen(false)}>
+            <Logo size="md" />
           </Link>
         </div>
 

@@ -318,8 +318,3 @@ export async function deleteStation(id: string): Promise<boolean> {
   setLocalStore(filtered);
   return filtered.length < initialLen;
 }
-
-export function resetToSeedData(): Station[] {
-  setLocalStore([...INITIAL_STATIONS]);
-  return getLocalStore();
-}

@@ -38,7 +38,7 @@ export function checkIsSiteAdmin(email?: string, role?: string): boolean {
   );
 }
 
-// Pre-seeded Demo Accounts
+// Default Administrative Accounts (Local persistence fallback)
 const DEFAULT_SITE_ADMIN: AdminUser = {
   id: 'usr-admin-01',
   email: 'admin@evchargers.rw',
@@ -126,7 +126,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       // 2. Zero-config Local Fallback Mode
-      // Check pre-seeded site admin
+      // Check default site admin
       if (cleanEmail === 'admin@evchargers.rw' && password === 'Admin123!') {
         setUser(DEFAULT_SITE_ADMIN);
         localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(DEFAULT_SITE_ADMIN));
@@ -134,7 +134,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return { success: true };
       }
 
-      // Check pre-seeded operator
+      // Check default operator
       if (cleanEmail === 'operator@kigalihub.rw' && (password === 'Host123!' || password === 'Admin123!')) {
         setUser(DEFAULT_OPERATOR);
         localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(DEFAULT_OPERATOR));

@@ -37,7 +37,6 @@ An interactive platform to discover, filter, and navigate to electric vehicle (E
 * **Address Geocoding**: Type an address to auto-center the map and place the pin.
 * **Dynamic Multi-Plug Builder**: Add multiple connectors per station with GB/T, CCS 2, Type 2 presets.
 * **Station Directory & Quick Management**: Searchable data table with instant status toggles, inline editing, and deletion.
-* **One-Click Demo Seeder**: Instantly populate realistic sample charging stations across Kigali.
 
 ---
 

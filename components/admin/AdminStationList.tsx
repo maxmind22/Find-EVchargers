@@ -10,7 +10,6 @@ import {
   Sparkles,
   Loader2,
   AlertCircle,
-  Database,
   User,
   PlusCircle,
 } from 'lucide-react';
@@ -35,7 +34,6 @@ export function AdminStationList({
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('ALL');
   const [deletingId, setDeletingId] = useState<string | null>(null);
-  const [isSeeding, setIsSeeding] = useState(false);
 
   // Filter stations
   const filtered = stations.filter((s) => {
@@ -96,22 +94,6 @@ export function AdminStationList({
     }
   };
 
-  const handleSeed = async () => {
-    if (!confirm('This will reload realistic sample EV charging stations into the system. Proceed?')) return;
-
-    setIsSeeding(true);
-    try {
-      const res = await fetch('/api/seed', { method: 'POST' });
-      if (res.ok) {
-        onRefresh();
-      }
-    } catch (e) {
-      console.warn('Seed error:', e);
-    } finally {
-      setIsSeeding(false);
-    }
-  };
-
   return (
     <div className="space-y-5">
       {/* Metric Cards */}
@@ -167,21 +149,6 @@ export function AdminStationList({
             <option value="OFFLINE">Offline Only</option>
           </select>
         </div>
-
-        {isSiteAdmin && (
-          <button
-            onClick={handleSeed}
-            disabled={isSeeding}
-            className="flex items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-semibold text-slate-700 shadow-sm hover:bg-slate-50 transition-colors disabled:opacity-50"
-          >
-            {isSeeding ? (
-              <Loader2 className="h-3.5 w-3.5 animate-spin text-brand-600" />
-            ) : (
-              <Database className="h-3.5 w-3.5 text-brand-600" />
-            )}
-            <span>Reset / Load Demo Hubs</span>
-          </button>
-        )}
       </div>
 
       {/* Data Table */}
@@ -200,7 +167,7 @@ export function AdminStationList({
               </p>
               <p className="text-xs text-slate-400 mt-1 max-w-sm">
                 {isSiteAdmin
-                  ? 'Try clearing your search query or load demo stations.'
+                  ? 'Try clearing your search query or add a new station to the network.'
                   : 'Register your electric vehicle charging station to appear on the Kigali Driver Map.'}
               </p>
             </div>
